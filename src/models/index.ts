@@ -1,7 +1,8 @@
 import {Sequelize} from 'sequelize';
 import initUser from './User';
+import config from '../utils/config';
 
-export const sequelize = new Sequelize(process.env.POSTGRES_URL!);
+export const sequelize = new Sequelize(config.postgresUrl);
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const UserModel = initUser(sequelize);

@@ -20,6 +20,5 @@
         "sourceType": "module"
     },
     "rules": {
-        "@typescript-eslint/naming-convention": 0
     }
 }

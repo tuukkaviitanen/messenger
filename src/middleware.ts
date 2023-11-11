@@ -5,6 +5,7 @@ import {AuthenticationError} from './customErrors';
 import jwt from 'jsonwebtoken';
 import {userPublicSchema, type UserPublic} from './validators/UserPublic';
 import {type RequestWithUser} from './types';
+import config from './utils/config';
 
 export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next) => {
 	if (error instanceof ZodError) {
@@ -31,7 +32,7 @@ export const parseToken = (req: RequestWithUser, res: Response, next: NextFuncti
 
 	if (token) {
 		try {
-			const decodedToken: unknown = jwt.verify(token, process.env.JWT_SECRET!);
+			const decodedToken: unknown = jwt.verify(token, config.jwtSecret);
 
 			const user = userPublicSchema.parse(decodedToken);
 
