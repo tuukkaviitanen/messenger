@@ -6,9 +6,9 @@ import {type RequestWithUser} from '../types';
 
 const usersRouter = createRouter();
 
-usersRouter.get('/:id', (req: RequestWithUser, res) => {
+usersRouter.get('/:id', async (req, res) => {
 	const {id} = req.params;
-	const user = userService.getSingle(id);
+	const user = await userService.getSingle(id);
 
 	if (!user) {
 		return res.sendStatus(404);
