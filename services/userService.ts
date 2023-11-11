@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import {v4 as uuidv4} from 'uuid';
-import {type UserPublic, type UserCredentials} from '../types';
+import {type UserPublic} from '../types';
+import {type UserCredentials} from '../validators/UserCredentials';
 
 const users = [
 	{
@@ -17,7 +18,11 @@ const users = [
 
 const getAll = () => users;
 
-const getSingle = (id: string) => users.find(u => u.id === id);
+const getSingle = (id: string): UserPublic | undefined => {
+	const user = users.find(u => u.id === id);
+
+	return user ? {id: user.id, username: user.username} : undefined;
+};
 
 const create = async ({username, password}: UserCredentials): Promise<UserPublic> => {
 	const salt = 10;
