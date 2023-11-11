@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt';
 import {v4 as uuidv4} from 'uuid';
 import {type UserPublic} from '../types';
 import {type UserCredentials} from '../validators/UserCredentials';
+import {AuthenticationError} from '../customErrors';
 
 const users = [
 	{
@@ -34,6 +35,16 @@ const create = async ({username, password}: UserCredentials): Promise<UserPublic
 	return {id, username};
 };
 
-const userService = {getAll, getSingle, create};
+const getToken = async ({username, password}: UserCredentials): Promise<string> => {
+	const user = users.find(u => u.username === username);
+
+	if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+		throw new AuthenticationError('Incorrect username or password');
+	}
+
+	return 'successful token';
+};
+
+const userService = {getAll, getSingle, create, getToken};
 
 export default userService;
