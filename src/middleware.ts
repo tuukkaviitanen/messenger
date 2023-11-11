@@ -1,7 +1,10 @@
-import {type ErrorRequestHandler} from 'express';
+import {type ErrorRequestHandler, type NextFunction, type Request, type Response} from 'express';
 import {ZodError} from 'zod';
 import {fromZodError} from 'zod-validation-error';
 import {AuthenticationError} from './customErrors';
+import jwt from 'jsonwebtoken';
+import {userPublicSchema, type UserPublic} from './validators/UserPublic';
+import {type RequestWithUser} from './types';
 
 export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next) => {
 	if (error instanceof ZodError) {
@@ -21,4 +24,23 @@ export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next
 	}
 
 	next(error);
+};
+
+export const parseToken = (req: RequestWithUser, res: Response, next: NextFunction) => {
+	const token = req.headers.authorization?.replace(/^bearer /i, '');
+
+	if (token) {
+		try {
+			const decodedToken: unknown = jwt.verify(token, process.env.JWT_SECRET!);
+
+			const user = userPublicSchema.parse(decodedToken);
+
+			req.user = user;
+		} catch (error) {
+			console.error(error);
+			next(new AuthenticationError('Invalid Authorization header'));
+		}
+	}
+
+	next();
 };

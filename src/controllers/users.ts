@@ -2,10 +2,11 @@ import {Router as createRouter} from 'express';
 
 import userService from '../services/userService';
 import {userCredentialsSchema} from '../validators/UserCredentials';
+import {type RequestWithUser} from '../types';
 
 const usersRouter = createRouter();
 
-usersRouter.get('/:id', (req, res) => {
+usersRouter.get('/:id', (req: RequestWithUser, res) => {
 	const {id} = req.params;
 	const user = userService.getSingle(id);
 

@@ -1,5 +1,6 @@
+import {type Request} from 'express';
+import {type UserPublic} from './validators/UserPublic';
 
-export type UserPublic = {
-	id: string;
-	username: string;
-};
+export type RequestWithUser = {
+	user?: UserPublic;
+} & Request;
