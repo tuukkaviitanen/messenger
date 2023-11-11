@@ -1,5 +1,7 @@
 import bcrypt from 'bcrypt';
 import {v4 as uuidv4} from 'uuid';
+import jwt from 'jsonwebtoken';
+
 import {type UserPublic} from '../types';
 import {type UserCredentials} from '../validators/UserCredentials';
 import {AuthenticationError} from '../customErrors';
@@ -42,7 +44,13 @@ const getToken = async ({username, password}: UserCredentials): Promise<string> 
 		throw new AuthenticationError('Incorrect username or password');
 	}
 
-	return 'successful token';
+	const tokenContent: UserPublic = {id: user.id, username: user.username};
+
+	const secret = process.env.JWT_SECRET ?? 'secret'; // This should never be assigned
+
+	const token = jwt.sign(tokenContent, secret);
+
+	return token;
 };
 
 const userService = {getAll, getSingle, create, getToken};
