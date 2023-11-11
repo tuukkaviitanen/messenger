@@ -17,6 +17,7 @@ const initUser = (sequelize: Sequelize) => {
 		username: {
 			type: DataTypes.TEXT,
 			allowNull: false,
+			unique: true,
 		},
 		passwordHash: {
 			type: DataTypes.TEXT,

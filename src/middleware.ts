@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import {userPublicSchema, type UserPublic} from './validators/UserPublic';
 import {type RequestWithUser} from './types';
 import config from './utils/config';
+import {UniqueConstraintError} from 'sequelize';
 
 export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next) => {
 	if (error instanceof ZodError) {
@@ -17,6 +18,15 @@ export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next
 	if (error instanceof AuthenticationError) {
 		console.error(error.message);
 		return res.status(401).json({error: error.message});
+	}
+
+	if (error instanceof UniqueConstraintError) {
+		const fieldKeys = Object.keys(error.fields);
+
+		const errorMessages = fieldKeys.map(key => `${key} '${error.fields[key] as string}' is already in use`);
+
+		console.error(errorMessages);
+		return res.status(400).json({error: errorMessages.join(', ')});
 	}
 
 	if (error instanceof Error) {
