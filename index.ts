@@ -1,12 +1,8 @@
-import express from 'express';
+
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const app = express();
-
-app.get('/api/healthz', (req, res) => {
-	res.send('ok');
-});
+import app from './app';
 
 const port = Number(process.env.PORT) || 3000;
 
