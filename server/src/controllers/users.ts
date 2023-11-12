@@ -21,7 +21,7 @@ usersRouter.post('/', async (req, res) => {
 
 	const user = await userService.create(userCredentials);
 
-	return res.json(user);
+	return res.status(201).json(user);
 });
 
 export default usersRouter;

@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv';
+import logger from './logger';
 dotenv.config();
 
 const port = process.env.PORT;
@@ -14,10 +15,10 @@ const nodeEnv = process.env.NODE_ENV;
 const postgresUrl = (nodeEnv === 'test') ? postgresUrlTesting : postgresUrlProduction;
 
 if (!jwtSecret || !postgresUrl || !nodeEnv) {
-	console.error('All required env variables are not set!');
+	logger.error('All required env variables are not set!');
 	process.exit(1);
 }
 
-const config = {port, jwtSecret, postgresUrl};
+const config = {port, jwtSecret, postgresUrl, nodeEnv};
 
 export default config;
