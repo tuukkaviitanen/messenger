@@ -5,9 +5,15 @@ const port = process.env.PORT;
 
 const jwtSecret = process.env.JWT_SECRET;
 
-const postgresUrl = process.env.POSTGRES_URL;
+const postgresUrlProduction = process.env.POSTGRES_URL;
 
-if (!jwtSecret || !postgresUrl) {
+const postgresUrlTesting = process.env.POSTGRES_URL_TEST;
+
+const nodeEnv = process.env.NODE_ENV;
+
+const postgresUrl = (nodeEnv === 'test') ? postgresUrlTesting : postgresUrlProduction;
+
+if (!jwtSecret || !postgresUrl || !nodeEnv) {
 	console.error('All required env variables are not set!');
 	process.exit(1);
 }
