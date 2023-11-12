@@ -3,20 +3,21 @@ import {ZodError} from 'zod';
 import {fromZodError} from 'zod-validation-error';
 import {AuthenticationError} from './customErrors';
 import jwt from 'jsonwebtoken';
-import {userPublicSchema, type UserPublic} from './validators/UserPublic';
+import {userPublicSchema} from './validators/UserPublic';
 import {type RequestWithUser} from './types';
 import config from './utils/config';
-import {BaseError, DatabaseError, UniqueConstraintError} from 'sequelize';
+import {DatabaseError, UniqueConstraintError} from 'sequelize';
+import logger from './utils/logger';
 
 export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next) => {
 	if (error instanceof ZodError) {
 		const {message} = fromZodError(error);
-		console.log(message);
+		logger.info(message);
 		return res.status(400).json({error: message});
 	}
 
 	if (error instanceof AuthenticationError) {
-		console.log(error.message);
+		logger.info(error.message);
 		return res.status(401).json({error: error.message});
 	}
 
@@ -25,17 +26,17 @@ export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next
 
 		const errorMessages = fieldKeys.map(key => `${key} '${error.fields[key] as string}' is already in use`);
 
-		console.log(errorMessages);
+		logger.info(errorMessages);
 		return res.status(400).json({error: errorMessages.join(', ')});
 	}
 
 	if (error instanceof DatabaseError) {
-		console.error(error.message);
+		logger.error(error.message);
 		return res.status(500).json({error: error.message});
 	}
 
 	if (error instanceof Error) {
-		console.error(error.message);
+		logger.error(error.message);
 		return res.status(500).json({error: error.message});
 	}
 
@@ -53,7 +54,7 @@ export const parseToken = (req: RequestWithUser, res: Response, next: NextFuncti
 
 			req.user = user;
 		} catch (error) {
-			console.error(error);
+			logger.error(error);
 			next(new AuthenticationError('Invalid Authorization header'));
 		}
 	}
