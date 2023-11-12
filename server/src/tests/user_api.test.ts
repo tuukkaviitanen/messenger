@@ -2,7 +2,6 @@ import supertest from 'supertest';
 
 import app from '../app';
 import {UserModel, sequelize} from '../models';
-import {response} from 'express';
 
 const api = supertest(app);
 

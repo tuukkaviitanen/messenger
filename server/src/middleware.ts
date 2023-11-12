@@ -1,4 +1,4 @@
-import {type ErrorRequestHandler, type NextFunction, type Request, type Response} from 'express';
+import {type ErrorRequestHandler, type NextFunction, type Response} from 'express';
 import {ZodError} from 'zod';
 import {fromZodError} from 'zod-validation-error';
 import {AuthenticationError} from './customErrors';
