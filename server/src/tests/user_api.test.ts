@@ -1,19 +1,19 @@
 import supertest from 'supertest';
 
 import app from '../app';
-import {UserModel, sequelize} from '../models';
+import {userTable, sequelize} from '../database';
 
 const api = supertest(app);
 
 const resetUsers = async () => {
-	await UserModel.destroy({
+	await userTable.destroy({
 		truncate: true,
 	});
 };
 
 beforeAll(async () => {
 	await sequelize.authenticate();
-	await UserModel.sync();
+	await userTable.sync();
 });
 
 beforeEach(async () => {
@@ -28,7 +28,7 @@ describe('get user', () => {
 	});
 
 	test('should return 200 and user when found', async () => {
-		const createdUser = await UserModel.create({username: 'hellouser', passwordHash: 'passwordhash'});
+		const createdUser = await userTable.create({username: 'hellouser', passwordHash: 'passwordhash'});
 
 		const response = await api
 			.get(`/api/users/${createdUser.id}`)
@@ -79,7 +79,7 @@ describe('create user', () => {
 			.expect(201)
 			.expect('Content-Type', /application\/json/);
 
-		const createdUser = await UserModel.findOne({where: {username: user.username}});
+		const createdUser = await userTable.findOne({where: {username: user.username}});
 
 		expect(createdUser).toBeDefined();
 

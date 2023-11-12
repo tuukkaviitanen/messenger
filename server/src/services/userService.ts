@@ -4,20 +4,20 @@ import jwt from 'jsonwebtoken';
 import {type UserPublic} from '../validators/UserPublic';
 import {type UserCredentials} from '../validators/UserCredentials';
 import {AuthenticationError} from '../customErrors';
-import {type User} from '../models/User';
-import {UserModel} from '../models';
+import {type User} from '../database/models/User';
+import {userTable} from '../database';
 import config from '../utils/config';
 
 const userToPublicUser = (user: User): UserPublic => ({id: user.id, username: user.username});
 
 const getAll = async () => {
-	const users = await UserModel.findAll();
+	const users = await userTable.findAll();
 
 	return users.map(u => (userToPublicUser(u)));
 };
 
 const getSingle = async (id: string) => {
-	const user = await UserModel.findByPk(id);
+	const user = await userTable.findByPk(id);
 
 	if (!user) {
 		return undefined;
@@ -30,13 +30,13 @@ const create = async ({username, password}: UserCredentials): Promise<UserPublic
 	const salt = 10;
 	const passwordHash = await bcrypt.hash(password, salt);
 
-	const createdUser = await UserModel.create({username, passwordHash});
+	const createdUser = await userTable.create({username, passwordHash});
 
 	return userToPublicUser(createdUser);
 };
 
 const getToken = async ({username, password}: UserCredentials): Promise<string> => {
-	const user = await UserModel.findOne({where: {username}});
+	const user = await userTable.findOne({where: {username}});
 
 	if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
 		throw new AuthenticationError('Incorrect username or password');

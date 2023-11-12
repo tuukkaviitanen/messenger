@@ -1,6 +1,6 @@
 
 import app from './src/app';
-import {connectToDatabase} from './src/models';
+import {connectToDatabase} from './src/database';
 import config from './src/utils/config';
 import logger from './src/utils/logger';
 

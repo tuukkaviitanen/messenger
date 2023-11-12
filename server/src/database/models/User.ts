@@ -7,7 +7,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
 	declare passwordHash: string;
 }
 
-const initUser = (sequelize: Sequelize) => {
+const initUserTable = (sequelize: Sequelize) => {
 	const user = User.init({
 		id: {
 			type: DataTypes.UUID,
@@ -34,4 +34,4 @@ const initUser = (sequelize: Sequelize) => {
 	return user;
 };
 
-export default initUser;
+export default initUserTable;
