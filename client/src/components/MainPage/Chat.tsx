@@ -1,14 +1,30 @@
 import { Box, Button, ListItem, TextField } from '@mui/material';
 import { Message } from '../../utils/types';
 import { useState } from 'react';
+import { socket } from '../../utils/socket';
 
-interface Params {
-  messages: Message[];
-}
 
-const Chat = ({ messages }: Params) => {
+const initialMessages: Message[] = [{ message: 'hello', sender: 'tuukka' }, { message: 'how are you?', sender: 'tuukka' }];
+
+const Chat = () => {
 
   const [messageField, setMessageField] = useState('');
+
+  const [messages, setMessages] = useState(initialMessages)
+
+  const sendMessage = () => {
+    socket.emit('message', messageField)
+    setMessageField('')
+  }
+
+  socket.on('message', (sender: string, message: string) => {
+    setMessages([...messages, {sender, message}])
+  })
+
+  socket.on('connect_error', (error) => {
+    setMessages([...messages, {sender: 'server', message: error.message}])
+  })
+
 
   return (
     <>
@@ -20,7 +36,7 @@ const Chat = ({ messages }: Params) => {
         ))}
       </Box>
       <TextField value={messageField} onChange={(event) => { setMessageField(event.target.value); }}/>
-      <Button>Send</Button>
+      <Button onClick={sendMessage}>Send</Button>
     </>
   );
 };
