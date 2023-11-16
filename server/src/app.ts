@@ -1,7 +1,7 @@
 import express from 'express';
 import 'express-async-errors';
 import usersRouter from './controllers/users';
-import {errorHandler, parseToken} from './middleware';
+import {errorHandler, parseToken} from './utils/middleware';
 import loginRouter from './controllers/login';
 
 const app = express();
