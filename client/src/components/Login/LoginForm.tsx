@@ -2,6 +2,7 @@ import * as yup from 'yup';
 
 import FormBase from './FormBase';
 import { UserCredentials } from '../../utils/types';
+import loginService from '../../services/loginService';
 
 const LoginForm = () => {
   const validationSchema = yup.object({
@@ -9,8 +10,9 @@ const LoginForm = () => {
     password: yup.string().required('Password is required'),
   });
 
-  const onSubmit = (values: UserCredentials) => {
-    console.log('logged in user', values);
+  const onSubmit = async (credentials: UserCredentials) => {
+    const token = await loginService.getToken(credentials)
+    console.log('successfully logged in user', token);
   };
 
   return (

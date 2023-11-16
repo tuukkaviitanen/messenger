@@ -26,7 +26,7 @@ const styles: StyleSheet = {
 
 interface Params {
   header: string;
-  onSubmit: (values: UserCredentials) => void;
+  onSubmit: (values: UserCredentials) => Promise<void>;
   validationSchema: yup.ObjectSchema<
     {
       username: string;
