@@ -35,6 +35,13 @@ There are integration tests for all endpoints. These tests are using a separate 
 
 ## Setup
 
+### Environment
+
+###### Node 18.x
+
+The build process requires a least Node version 15.x or higher because of some dependencies. Some dependencies warn that to get the optimal performance, at least version 18.x is needed.
+It's good to note that these are dev dependencies and running the built application in production might be possible with a lower version of node.
+
 ### Backend
 
 1. Change to `/server` directory
