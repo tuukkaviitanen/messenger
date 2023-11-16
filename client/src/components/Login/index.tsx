@@ -1,14 +1,17 @@
 import { Box, Typography } from '@mui/material';
 import { StyleSheet } from '../../utils/types';
 import LoginForm from './LoginForm';
+import RegisterForm from './RegisterForm';
 
 const styles: StyleSheet = {
   header: {
     textAlign: 'center',
+    my: 5
   },
   container: {
     display: 'flex',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    flexDirection: {xs: 'column', md: 'row'}
   },
 };
 
@@ -20,7 +23,7 @@ const Login = () => {
       </Typography>
       <Box sx={styles.container}>
         <LoginForm />
-        <LoginForm />
+        <RegisterForm />
       </Box>
     </Box>
   );
