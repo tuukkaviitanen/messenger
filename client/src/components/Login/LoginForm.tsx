@@ -1,7 +1,6 @@
 import * as yup from 'yup';
 
-import FormBase from './FormBase';
-import { UserCredentials } from '../../utils/types';
+import FormBase, { FormikOnSubmit } from './FormBase';
 import loginService from '../../services/loginService';
 import { setCurrentUser } from '../../reducers/userReducer';
 import { useAppDispatch } from '../../hooks';
@@ -14,7 +13,7 @@ const LoginForm = () => {
     password: yup.string().required('Password is required'),
   });
 
-  const onSubmit = async (credentials: UserCredentials) => {
+  const onSubmit: FormikOnSubmit = async (credentials) => {
     const currentUser = await loginService.login(credentials)
 
     dispatch(setCurrentUser(currentUser))

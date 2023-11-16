@@ -17,6 +17,7 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    '@typescript-eslint/no-non-null-assertion': 0,
   },
   parserOptions: {
     ecmaVersion: 'latest',

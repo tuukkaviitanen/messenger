@@ -24,9 +24,11 @@ const styles: StyleSheet = {
   },
 };
 
+export type FormikOnSubmit = (values: UserCredentials, actions: { resetForm: () => void}) => Promise<void>;
+
 interface Params {
   header: string;
-  onSubmit: (values: UserCredentials) => Promise<void>;
+  onSubmit: FormikOnSubmit
   validationSchema: yup.ObjectSchema<
     {
       username: string;

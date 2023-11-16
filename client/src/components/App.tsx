@@ -4,6 +4,9 @@ import { Container } from '@mui/material';
 import Chat from './Chat';
 import { useAppSelector, useStoredUser } from '../hooks';
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const App = () => {
   useStoredUser();
 
@@ -21,6 +24,7 @@ const App = () => {
           <Route path='*' element={<Navigate to='/' replace />} />
         </Routes>
       </Container>
+      <ToastContainer/>
     </>
   );
 };
