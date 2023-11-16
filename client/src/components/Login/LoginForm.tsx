@@ -3,16 +3,21 @@ import * as yup from 'yup';
 import FormBase from './FormBase';
 import { UserCredentials } from '../../utils/types';
 import loginService from '../../services/loginService';
+import { setCurrentUser } from '../../reducers/userReducer';
+import { useAppDispatch } from '../../hooks';
 
 const LoginForm = () => {
+  const dispatch = useAppDispatch()
+
   const validationSchema = yup.object({
     username: yup.string().required('Username is required'),
     password: yup.string().required('Password is required'),
   });
 
   const onSubmit = async (credentials: UserCredentials) => {
-    const token = await loginService.getToken(credentials)
-    console.log('successfully logged in user', token);
+    const currentUser = await loginService.login(credentials)
+
+    dispatch(setCurrentUser(currentUser))
   };
 
   return (
