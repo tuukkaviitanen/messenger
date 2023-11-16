@@ -54,7 +54,7 @@ const FormBase = ({ header, onSubmit, validationSchema }: Params) => {
   return (
     <form onSubmit={formik.handleSubmit}>
       <Box sx={styles.container}>
-        <Paper sx={styles.formContainer}>
+        <Paper elevation={5} sx={styles.formContainer}>
           <Typography variant='h4' sx={styles.header}>
             {header}
           </Typography>
