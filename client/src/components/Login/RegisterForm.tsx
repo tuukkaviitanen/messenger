@@ -13,27 +13,34 @@ const RegisterForm = () => {
   });
 
   const onSubmit: FormikOnSubmit = async (values, { resetForm }) => {
-    const toastId = toast.loading('Creating user')
+    const toastId = toast.loading('Creating user');
 
-    try{
+    try {
       const user = await userService.createUser(values);
-      toast.update(toastId, {render: `User "${user.username}" created successfully!`, type: "success", isLoading: false, autoClose: 5000});
-    }
-    catch(ex){
+      toast.update(toastId, {
+        render: `User "${user.username}" created successfully!`,
+        type: 'success',
+        isLoading: false,
+        autoClose: 5000,
+      });
+    } catch (ex) {
       let message: string | undefined;
 
-      if(axios.isAxiosError<ExpectedAxiosErrorResponse>(ex)){
-        message = `User creation failed! ${ex.response?.data.error}`
+      if (axios.isAxiosError<ExpectedAxiosErrorResponse>(ex)) {
+        message = `User creation failed! ${ex.response?.data.error}`;
+      } else {
+        message = 'User creation failed!';
       }
-      else{
-        message = 'User creation failed!'
-      }
-      toast.update(toastId, {render: message, type: "error", isLoading: false, autoClose: 5000});
-      console.error('creating user failed', ex)
-    }finally{
+      toast.update(toastId, {
+        render: message,
+        type: 'error',
+        isLoading: false,
+        autoClose: 5000,
+      });
+      console.error('creating user failed', ex);
+    } finally {
       resetForm();
     }
-
   };
 
   return (
