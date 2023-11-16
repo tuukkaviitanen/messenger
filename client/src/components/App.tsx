@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Login';
 import { Container } from '@mui/material';
-import Chat from './Chat';
+import Chat from './MainPage';
 import { useAppSelector, useStoredUser } from '../hooks';
 
 import { ToastContainer } from 'react-toastify';
@@ -18,7 +18,7 @@ const App = () => {
         <Routes>
           <Route path='/login' element={currentUser ?  <Navigate to='/' replace /> : <Login />} />
           <Route
-            path='/'
+            path='/*'
             element={currentUser ? <Chat /> : <Navigate to='/login' replace />}
           />
           <Route path='*' element={<Navigate to='/' replace />} />

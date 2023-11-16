@@ -15,3 +15,8 @@ export interface User {
 export interface ExpectedAxiosErrorResponse {
   error: string
 }
+
+export interface Message {
+  sender: string,
+  message: string,
+}
