@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import logger from './logger';
 dotenv.config();
 
-const port = process.env.PORT;
+const port = Number(process.env.PORT) || 3000;
 
 const jwtSecret = process.env.JWT_SECRET;
 
