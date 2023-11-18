@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Message, StyleSheet } from '../../utils/types';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAppSelector } from '../../hooks/typedReduxHooks';
 
 const styles: StyleSheet = {
@@ -41,10 +41,10 @@ const Chat = () => {
   const socket = useAppSelector((state) => state.socket.connection);
 
   const setRef = useCallback((node: HTMLElement | null) => {
-    if(node){
-      node.scrollIntoView({behavior: 'smooth'})
+    if (node) {
+      node.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [])
+  }, []);
 
   const sendMessage = () => {
     socket?.emit('message', messageField);
@@ -53,31 +53,51 @@ const Chat = () => {
 
   enum SocketEvent {
     Message = 'message',
-    ConnectionError = 'connect_error'
+    ConnectionError = 'connect_error',
   }
 
   interface MessageContent {
-    sender: string,
-    message: string
+    sender: string;
+    message: string;
+    timestamp: string;
   }
 
-  socket?.on(SocketEvent.Message, ({sender, message}: MessageContent) => {
-    setMessages([...messages, { sender, message }]);
-  });
+  useEffect(() => {
+    if (!socket) return;
 
-  socket?.on(SocketEvent.ConnectionError, (error) => {
-    setMessages([...messages, { sender: 'server', message: error.message }]);
-  });
+    socket.on(
+      SocketEvent.Message,
+      ({ sender, message, timestamp }: MessageContent) => {
+        console.log('socket listener called');
+        setMessages([
+          ...messages,
+          { sender, message, timestamp: new Date(timestamp) },
+        ]);
+      }
+    );
+
+    socket.on(SocketEvent.ConnectionError, (error) => {
+      setMessages([
+        ...messages,
+        { sender: 'server', message: error.message, timestamp: new Date() },
+      ]);
+    });
+
+    return () => {
+      socket.off(SocketEvent.Message);
+      socket.off(SocketEvent.ConnectionError);
+    };
+  }, [socket, SocketEvent, messages]);
 
   return (
     <Box sx={styles.container}>
       <Box sx={styles.chatArea}>
         {messages.map((m, index) => {
-          const lastMessage = messages.length - 1 === index
+          const lastMessage = messages.length - 1 === index;
           return (
             <ListItem
               ref={lastMessage ? setRef : null}
-              key={m.sender + m.message}
+              key={m.sender + m.message + m.timestamp.toISOString()}
             >
               <Typography>
                 {m.sender}: {m.message}

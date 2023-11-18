@@ -53,21 +53,27 @@ enum SocketEvent {
 	Message = 'message',
 }
 
+type MessageContent = {
+	sender: string;
+	message: string;
+	timestamp: Date;
+};
+
 io.on(SocketEvent.Connection, async socket => {
 	const {user} = (socket as SocketWithUser);
 	await socket.join(user.id);
 
 	logger.info(`socket ${socket.id} connected as user ${user.username}`);
-	socket.broadcast.emit(SocketEvent.Message, {sender: user.username, message: 'joined the chat'});
+	socket.broadcast.emit(SocketEvent.Message, {sender: user.username, message: 'joined the chat', timestamp: new Date()});
 
 	socket.on(SocketEvent.Message, (message: string) => {
 		logger.info(`message received from ${socket.id}`, message);
-		io.emit(SocketEvent.Message, {sender: user.username, message});
+		io.emit(SocketEvent.Message, {sender: user.username, message, timestamp: new Date()});
 	});
 
 	socket.on(SocketEvent.Disconnect, () => {
 		logger.info(`${user.username} disconnected`);
-		socket.broadcast.emit(SocketEvent.Message, {sender: user.username, message: 'left the chat'});
+		socket.broadcast.emit(SocketEvent.Message, {sender: user.username, message: 'left the chat', timestamp: new Date()});
 	});
 });
 
