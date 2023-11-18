@@ -15,6 +15,7 @@ const styles: StyleSheet = {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
+    flexGrow: 10
   },
   inputContainer: {
     display: 'flex',
@@ -68,7 +69,6 @@ const Chat = () => {
     socket.on(
       SocketEvent.Message,
       ({ sender, message, timestamp }: MessageContent) => {
-        console.log('socket listener called');
         setMessages([
           ...messages,
           { sender, message, timestamp: new Date(timestamp) },

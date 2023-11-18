@@ -8,9 +8,8 @@ import { Box } from '@mui/material';
 
 const styles: StyleSheet = {
   container: {
-    display: 'grid',
-    gridTemplateColumns: '3fr 1fr',
-    height: '100%'
+    display: 'flex',
+    height: '100%',
   }
 }
 
