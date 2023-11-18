@@ -8,7 +8,9 @@ const styles: StyleSheet = {
     display: 'flex',
     flexDirection: 'column',
     p: 1,
-    m: 1
+    m: 1,
+    flexGrow: 1,
+    overflow: 'auto'
   },
   text: {
     textAlign: 'center'
