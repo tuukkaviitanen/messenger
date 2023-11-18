@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import { Message, StyleSheet } from '../../utils/types';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useAppSelector } from '../../hooks/typedReduxHooks';
 
 const styles: StyleSheet = {
@@ -40,6 +40,12 @@ const Chat = () => {
 
   const socket = useAppSelector((state) => state.socket.connection);
 
+  const setRef = useCallback((node: HTMLElement | null) => {
+    if(node){
+      node.scrollIntoView({behavior: 'smooth'})
+    }
+  }, [])
+
   const sendMessage = () => {
     socket?.emit('message', messageField);
     setMessageField('');
@@ -56,13 +62,19 @@ const Chat = () => {
   return (
     <Box sx={styles.container}>
       <Box sx={styles.chatArea}>
-        {messages.map((m) => (
-          <ListItem key={m.sender + m.message}>
-            <Typography>
-              {m.sender}: {m.message}
-            </Typography>
-          </ListItem>
-        ))}
+        {messages.map((m, index) => {
+          const lastMessage = messages.length - 1 === index
+          return (
+            <ListItem
+              ref={lastMessage ? setRef : null}
+              key={m.sender + m.message}
+            >
+              <Typography>
+                {m.sender}: {m.message}
+              </Typography>
+            </ListItem>
+          );
+        })}
       </Box>
       <Paper elevation={10} sx={styles.inputContainer}>
         <TextField
