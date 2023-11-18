@@ -1,21 +1,19 @@
 import {
   Box,
-  Button,
   ListItem,
-  Paper,
-  TextField,
   Typography,
 } from '@mui/material';
 import { Message, StyleSheet } from '../../utils/types';
 import { useState, useCallback, useEffect } from 'react';
 import { useAppSelector } from '../../hooks/typedReduxHooks';
+import ChatInput, {  OnSubmit } from './ChatInput';
 
 const styles: StyleSheet = {
   container: {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    flexGrow: 10
+    flexGrow: 10,
   },
   inputContainer: {
     display: 'flex',
@@ -23,9 +21,6 @@ const styles: StyleSheet = {
     justifyContent: 'space-evenly',
     m: 1,
     p: 1,
-  },
-  textField: {
-    flexGrow: 1,
   },
   chatArea: {
     flexGrow: 1,
@@ -35,8 +30,6 @@ const styles: StyleSheet = {
 };
 
 const Chat = () => {
-  const [messageField, setMessageField] = useState('');
-
   const [messages, setMessages] = useState<Message[]>([]);
 
   const socket = useAppSelector((state) => state.socket.connection);
@@ -46,11 +39,6 @@ const Chat = () => {
       node.scrollIntoView({ behavior: 'smooth' });
     }
   }, []);
-
-  const sendMessage = () => {
-    socket?.emit('message', messageField);
-    setMessageField('');
-  };
 
   enum SocketEvent {
     Message = 'message',
@@ -89,6 +77,11 @@ const Chat = () => {
     };
   }, [socket, SocketEvent, messages]);
 
+  const handleSendMessage: OnSubmit = ({messageField}, {resetForm}) => {
+    socket?.emit(SocketEvent.Message, messageField);
+    resetForm();
+  }
+
   return (
     <Box sx={styles.container}>
       <Box sx={styles.chatArea}>
@@ -106,18 +99,7 @@ const Chat = () => {
           );
         })}
       </Box>
-      <Paper elevation={10} sx={styles.inputContainer}>
-        <TextField
-          sx={styles.textField}
-          value={messageField}
-          onChange={(event) => {
-            setMessageField(event.target.value);
-          }}
-        />
-        <Button variant='contained' onClick={sendMessage}>
-          Send
-        </Button>
-      </Paper>
+      <ChatInput handleSendMessage={handleSendMessage} />
     </Box>
   );
 };
