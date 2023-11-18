@@ -1,6 +1,6 @@
 import { Button, Typography } from '@mui/material';
-import { useAppDispatch, useAppSelector } from '../../hooks';
 import { removeCurrentUser } from '../../reducers/userReducer';
+import { useAppDispatch, useAppSelector } from '../../hooks/typedReduxHooks';
 
 const NavBar = () => {
   const dispatch = useAppDispatch();

@@ -3,10 +3,10 @@ import * as yup from 'yup';
 import FormBase, { FormikOnSubmit } from './FormBase';
 import loginService from '../../services/loginService';
 import { setCurrentUser } from '../../reducers/userReducer';
-import { useAppDispatch } from '../../hooks';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { ExpectedAxiosErrorResponse } from '../../utils/types';
+import { useAppDispatch } from '../../hooks/typedReduxHooks';
 
 const LoginForm = () => {
   const dispatch = useAppDispatch();

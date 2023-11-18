@@ -1,27 +1,26 @@
 import { Box, Button, ListItem, TextField } from '@mui/material';
 import { Message } from '../../utils/types';
 import { useState } from 'react';
-import { socket } from '../../utils/socket';
-
-
-const initialMessages: Message[] = [{ message: 'hello', sender: 'tuukka' }, { message: 'how are you?', sender: 'tuukka' }];
+import { useAppSelector } from '../../hooks/typedReduxHooks';
 
 const Chat = () => {
 
   const [messageField, setMessageField] = useState('');
 
-  const [messages, setMessages] = useState(initialMessages)
+  const [messages, setMessages] = useState<Message[]>([])
+
+  const socket = useAppSelector(state => state.socket.connection)
 
   const sendMessage = () => {
-    socket.emit('message', messageField)
+    socket?.emit('message', messageField)
     setMessageField('')
   }
 
-  socket.on('message', (sender: string, message: string) => {
+  socket?.on('message', (sender: string, message: string) => {
     setMessages([...messages, {sender, message}])
   })
 
-  socket.on('connect_error', (error) => {
+  socket?.on('connect_error', (error) => {
     setMessages([...messages, {sender: 'server', message: error.message}])
   })
 

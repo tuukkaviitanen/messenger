@@ -1,13 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import userReducer from './reducers/userReducer';
+import socketReducer from './reducers/socketSlice';
 
- const store = configureStore({
-  reducer: {user: userReducer},
+const store = configureStore({
+  reducer: { user: userReducer, socket: socketReducer },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({serializableCheck: false})
 });
 
+export default store;
 
-export default store
-
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

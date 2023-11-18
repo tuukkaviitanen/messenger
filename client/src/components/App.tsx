@@ -2,10 +2,11 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Login';
 import { Container } from '@mui/material';
 import Chat from './MainPage';
-import { useAppSelector, useStoredUser } from '../hooks';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useAppSelector } from '../hooks/typedReduxHooks';
+import { useStoredUser } from '../hooks/useStoredUser';
 
 const App = () => {
   useStoredUser();
