@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '../hooks/typedReduxHooks';
 import { localStorageKeys } from '../utils/constants';
 import { useEffect } from 'react';
 import { userWithTokenSchema } from '../validators/UserWithToken';
-import { setCurrentUser } from '../reducers/userReducer';
+import { setCurrentUser } from '../reducers/userSlicer';
 
 const App = () => {
   const currentUser = useAppSelector((state) => state.user.currentUser);

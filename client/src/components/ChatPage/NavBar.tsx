@@ -1,5 +1,5 @@
 import { Button, Typography } from '@mui/material';
-import { removeCurrentUser } from '../../reducers/userReducer';
+import { removeCurrentUser } from '../../reducers/userSlicer';
 import { useAppDispatch, useAppSelector } from '../../hooks/typedReduxHooks';
 
 const NavBar = () => {

@@ -2,7 +2,7 @@ import * as yup from 'yup';
 
 import FormBase, { FormikOnSubmit } from './FormBase';
 import loginService from '../../services/loginService';
-import { setCurrentUser } from '../../reducers/userReducer';
+import { setCurrentUser } from '../../reducers/userSlicer';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import { ExpectedAxiosErrorResponse } from '../../utils/types';
