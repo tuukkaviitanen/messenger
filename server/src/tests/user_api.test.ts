@@ -20,148 +20,151 @@ beforeEach(async () => {
 	await resetUsers();
 });
 
-describe('get user', () => {
-	test('should return 404 when user not found', async () => {
-		await api
-			.get('/api/users/c5699691-b985-4238-aa3b-60cebdd7c29b')
-			.expect(404);
+describe('user api', () => {
+	describe('get user', () => {
+		test('should return 404 when user not found', async () => {
+			await api
+				.get('/api/users/c5699691-b985-4238-aa3b-60cebdd7c29b')
+				.expect(404);
+		});
+
+		test('should return 200 and user when found', async () => {
+			const createdUser = await userTable.create({username: 'hellouser', passwordHash: 'passwordhash'});
+
+			const response = await api
+				.get(`/api/users/${createdUser.id}`)
+				.expect(200);
+
+			const expectedUser = {id: createdUser.id, username: createdUser.username};
+
+			expect(response.body).toEqual(expectedUser);
+		});
 	});
 
-	test('should return 200 and user when found', async () => {
-		const createdUser = await userTable.create({username: 'hellouser', passwordHash: 'passwordhash'});
+	describe('create user', () => {
+		test('should return 400 when invalid username', async () => {
+			const user = {
+				username: 'he',
+				password: 'password',
+			};
 
-		const response = await api
-			.get(`/api/users/${createdUser.id}`)
-			.expect(200);
+			await api
+				.post('/api/users')
+				.send(user)
+				.expect(400)
+				.expect('Content-Type', /application\/json/);
+		});
 
-		const expectedUser = {id: createdUser.id, username: createdUser.username};
+		test('should return 400 when invalid password', async () => {
+			const user = {
+				username: 'hellouser',
+				password: 'pa',
+			};
 
-		expect(response.body).toEqual(expectedUser);
-	});
-});
+			await api
+				.post('/api/users')
+				.send(user)
+				.expect(400)
+				.expect('Content-Type', /application\/json/);
+		});
 
-describe('create user', () => {
-	test('should return 400 when invalid username', async () => {
-		const user = {
-			username: 'he',
-			password: 'password',
-		};
+		test('should return 201 and created user when valid credentials', async () => {
+			const user = {
+				username: 'hellouser',
+				password: 'password',
+			};
 
-		await api
-			.post('/api/users')
-			.send(user)
-			.expect(400)
-			.expect('Content-Type', /application\/json/);
-	});
+			const response = await api
+				.post('/api/users')
+				.send(user)
+				.expect(201)
+				.expect('Content-Type', /application\/json/);
 
-	test('should return 400 when invalid password', async () => {
-		const user = {
-			username: 'hellouser',
-			password: 'pa',
-		};
+			const createdUser = await userTable.findOne({where: {username: user.username}});
 
-		await api
-			.post('/api/users')
-			.send(user)
-			.expect(400)
-			.expect('Content-Type', /application\/json/);
-	});
+			expect(createdUser).toBeDefined();
 
-	test('should return 201 and created user when valid credentials', async () => {
-		const user = {
-			username: 'hellouser',
-			password: 'password',
-		};
+			const expectedUser = {id: createdUser!.id, username: createdUser!.username};
 
-		const response = await api
-			.post('/api/users')
-			.send(user)
-			.expect(201)
-			.expect('Content-Type', /application\/json/);
+			expect(response.body).toEqual(expectedUser);
+		});
 
-		const createdUser = await userTable.findOne({where: {username: user.username}});
+		test('should return 400 when username already exists', async () => {
+			const user = {
+				username: 'hellouser',
+				password: 'password',
+			};
 
-		expect(createdUser).toBeDefined();
+			await api
+				.post('/api/users')
+				.send(user)
+				.expect(201);
 
-		const expectedUser = {id: createdUser!.id, username: createdUser!.username};
-
-		expect(response.body).toEqual(expectedUser);
-	});
-
-	test('should return 400 when username already exists', async () => {
-		const user = {
-			username: 'hellouser',
-			password: 'password',
-		};
-
-		await api
-			.post('/api/users')
-			.send(user)
-			.expect(201);
-
-		await api
-			.post('/api/users')
-			.send(user)
-			.expect(400);
-	});
-});
-
-describe('login', () => {
-	test('should return token if credentials valid', async () => {
-		const user = {
-			username: 'hellouser',
-			password: 'password',
-		};
-
-		await api
-			.post('/api/users')
-			.send(user)
-			.expect(201);
-
-		const response = await api
-			.post('/api/login')
-			.send(user)
-			.expect(200);
-
-		expect(response.body).toHaveProperty('token');
+			await api
+				.post('/api/users')
+				.send(user)
+				.expect(400);
+		});
 	});
 
-	test('should return 401 if credentials invalid', async () => {
-		const user = {
-			username: 'hellouser',
-			password: 'password',
-		};
+	describe('login', () => {
+		test('should return token if credentials valid', async () => {
+			const user = {
+				username: 'hellouser',
+				password: 'password',
+			};
 
-		await api
-			.post('/api/users')
-			.send(user)
-			.expect(201);
+			await api
+				.post('/api/users')
+				.send(user)
+				.expect(201);
 
-		const response = await api
-			.post('/api/login')
-			.send({...user, password: 'passwords'})
-			.expect(401);
+			const response = await api
+				.post('/api/login')
+				.send(user)
+				.expect(200);
 
-		expect(response.body).not.toHaveProperty('token');
-	});
+			expect(response.body).toHaveProperty('token');
+			expect(typeof response.body.token === 'string').toBe(true);
+		});
 
-	test('should return 401 if credentials invalid', async () => {
-		const user = {
-			username: 'hellouser',
-			password: 'password',
-		};
+		test('should return 401 if credentials invalid', async () => {
+			const user = {
+				username: 'hellouser',
+				password: 'password',
+			};
 
-		await api
-			.post('/api/users')
-			.send(user)
-			.expect(201);
+			await api
+				.post('/api/users')
+				.send(user)
+				.expect(201);
 
-		const response = await api
-			.post('/api/login')
-			.send({...user, username: 'hellousers'})
-			.expect(401);
+			const response = await api
+				.post('/api/login')
+				.send({...user, password: 'passwords'})
+				.expect(401);
 
-		expect(response.body).not.toHaveProperty('token');
+			expect(response.body).not.toHaveProperty('token');
+		});
+
+		test('should return 401 if credentials invalid', async () => {
+			const user = {
+				username: 'hellouser',
+				password: 'password',
+			};
+
+			await api
+				.post('/api/users')
+				.send(user)
+				.expect(201);
+
+			const response = await api
+				.post('/api/login')
+				.send({...user, username: 'hellousers'})
+				.expect(401);
+
+			expect(response.body).not.toHaveProperty('token');
+		});
 	});
 });
 
