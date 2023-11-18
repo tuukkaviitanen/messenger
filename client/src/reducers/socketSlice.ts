@@ -1,36 +1,36 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Socket, io } from "socket.io-client";
+import {type PayloadAction, createSlice} from '@reduxjs/toolkit';
+import {type Socket, io} from 'socket.io-client';
 
-interface SocketState {
-  connection: Socket | null;
-}
+type SocketState = {
+	connection: Socket | undefined;
+};
 
 const initialState: SocketState = {
-  connection: null
-}
+	connection: null,
+};
 
-interface Payload {
-  token: string
-}
+type Payload = {
+	token: string;
+};
 
 const socketSlice = createSlice({
-  name: 'socket',
-  initialState,
-  reducers:{
-    startConnection: (_state, action: PayloadAction<Payload>) => {
-      const {token} = action.payload
-      const newSocket = io('http://localhost:3000', { auth: { token }})
-      return {connection: newSocket}
-    },
-    closeConnection: (state) => {
-      state.connection?.close()
-      state.connection = null
-    }
-  }
-})
+	name: 'socket',
+	initialState,
+	reducers: {
+		startConnection(_state, action: PayloadAction<Payload>) {
+			const {token} = action.payload;
+			const newSocket = io('http://localhost:3000', {auth: {token}});
+			return {connection: newSocket};
+		},
+		closeConnection(state) {
+			state.connection?.close();
+			state.connection = null;
+		},
+	},
+});
 
 export const {startConnection, closeConnection} = socketSlice.actions;
 
-const socketReducer = socketSlice.reducer
+const socketReducer = socketSlice.reducer;
 
-export default socketReducer
+export default socketReducer;

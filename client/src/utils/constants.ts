@@ -1,3 +1,3 @@
 export const localStorageKeys = {
-  currentUser: 'MESSENGER_USER'
+	currentUser: 'MESSENGER_USER',
 };
