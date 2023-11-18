@@ -34,7 +34,8 @@ const Chat = () => {
 
 	const socket = useAppSelector(state => state.socket.connection);
 
-	const setRef = useCallback((node: HTMLElement | undefined) => {
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	const setRef = useCallback((node: HTMLElement | null) => {
 		if (node) {
 			node.scrollIntoView({behavior: 'smooth'});
 		}

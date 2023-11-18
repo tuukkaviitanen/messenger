@@ -33,11 +33,6 @@ type Params = {
 	{
 		username: string;
 		password: string;
-	},
-	yup.AnyObject,
-	{
-		username: undefined;
-		password: undefined;
 	}
 	>;
 };

@@ -3,11 +3,11 @@ import {type UserWithToken} from '../validators/UserWithToken';
 import {localStorageKeys} from '../utils/constants';
 
 type InitialState = {
-	currentUser: UserWithToken | undefined;
+	currentUser?: UserWithToken;
 };
 
 const initialState: InitialState = {
-	currentUser: null,
+	currentUser: undefined,
 };
 
 export const userSlice = createSlice({
@@ -20,7 +20,7 @@ export const userSlice = createSlice({
 		},
 		removeCurrentUser(state) {
 			window.localStorage.removeItem(localStorageKeys.currentUser);
-			state.currentUser = null;
+			state.currentUser = undefined;
 		},
 	},
 });

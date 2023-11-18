@@ -2,11 +2,11 @@ import {type PayloadAction, createSlice} from '@reduxjs/toolkit';
 import {type Socket, io} from 'socket.io-client';
 
 type SocketState = {
-	connection: Socket | undefined;
+	connection?: Socket;
 };
 
 const initialState: SocketState = {
-	connection: null,
+	connection: undefined,
 };
 
 type Payload = {
@@ -24,7 +24,7 @@ const socketSlice = createSlice({
 		},
 		closeConnection(state) {
 			state.connection?.close();
-			state.connection = null;
+			state.connection = undefined;
 		},
 	},
 });
