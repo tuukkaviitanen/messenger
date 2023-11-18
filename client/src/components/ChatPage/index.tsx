@@ -21,8 +21,6 @@ const MainPage = () => {
 
   useEffect(() => {
 
-    console.log(user)
-
     if (user) {
       dispatch(startConnection({ token: user.token }));
     }
