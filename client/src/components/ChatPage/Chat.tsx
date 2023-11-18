@@ -51,11 +51,21 @@ const Chat = () => {
     setMessageField('');
   };
 
-  socket?.on('message', (sender: string, message: string) => {
+  enum SocketEvent {
+    Message = 'message',
+    ConnectionError = 'connect_error'
+  }
+
+  interface MessageContent {
+    sender: string,
+    message: string
+  }
+
+  socket?.on(SocketEvent.Message, ({sender, message}: MessageContent) => {
     setMessages([...messages, { sender, message }]);
   });
 
-  socket?.on('connect_error', (error) => {
+  socket?.on(SocketEvent.ConnectionError, (error) => {
     setMessages([...messages, { sender: 'server', message: error.message }]);
   });
 

@@ -47,21 +47,27 @@ io.use((socket, next) => {
 	}
 });
 
-io.on('connection', async socket => {
+enum SocketEvent {
+	Connection = 'connection',
+	Disconnect = 'disconnect',
+	Message = 'message',
+}
+
+io.on(SocketEvent.Connection, async socket => {
 	const {user} = (socket as SocketWithUser);
 	await socket.join(user.id);
 
 	logger.info(`socket ${socket.id} connected as user ${user.username}`);
-	socket.broadcast.emit('message', user.username, 'joined the chat');
+	socket.broadcast.emit(SocketEvent.Message, {sender: user.username, message: 'joined the chat'});
 
-	socket.on('message', (message: string) => {
+	socket.on(SocketEvent.Message, (message: string) => {
 		logger.info(`message received from ${socket.id}`, message);
-		io.emit('message', user.username, message);
+		io.emit(SocketEvent.Message, {sender: user.username, message});
 	});
 
-	socket.on('disconnect', () => {
+	socket.on(SocketEvent.Disconnect, () => {
 		logger.info(`${user.username} disconnected`);
-		socket.broadcast.emit('message', user.username, 'left the chat');
+		socket.broadcast.emit(SocketEvent.Message, {sender: user.username, message: 'left the chat'});
 	});
 });
 
