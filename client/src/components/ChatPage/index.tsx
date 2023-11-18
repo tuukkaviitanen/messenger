@@ -3,6 +3,17 @@ import Chat from './Chat';
 import NavBar from './NavBar';
 import { useAppDispatch, useAppSelector } from '../../hooks/typedReduxHooks';
 import { closeConnection, startConnection } from '../../reducers/socketSlice';
+import { StyleSheet } from '../../utils/types';
+import { Box } from '@mui/material';
+
+const styles: StyleSheet = {
+  container: {
+    display: 'grid',
+    gridTemplateColumns: '3fr 1fr',
+    height: '100%'
+  }
+}
+
 
 const MainPage = () => {
   const user = useAppSelector((state) => state.user.currentUser);
@@ -22,11 +33,10 @@ const MainPage = () => {
   }, [user, dispatch]);
 
   return (
-    <>
-      <NavBar />
-
+    <Box sx={styles.container}>
       <Chat />
-    </>
+      <NavBar />
+    </Box>
   );
 };
 

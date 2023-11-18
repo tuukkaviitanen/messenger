@@ -1,6 +1,19 @@
-import { Button, Typography } from '@mui/material';
+import { Button, Paper, Typography } from '@mui/material';
 import { removeCurrentUser } from '../../reducers/userSlicer';
 import { useAppDispatch, useAppSelector } from '../../hooks/typedReduxHooks';
+import { StyleSheet } from '../../utils/types';
+
+const styles: StyleSheet = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    p: 1,
+    m: 1
+  },
+  text: {
+    textAlign: 'center'
+  }
+}
 
 const NavBar = () => {
   const dispatch = useAppDispatch();
@@ -11,12 +24,12 @@ const NavBar = () => {
   };
 
   return (
-    <>
-      <Typography>Logged in as {currentUser?.username}</Typography>
-      <Button variant='contained' onClick={handleLogout}>
+    <Paper elevation={10} sx={styles.container}>
+      <Typography sx={styles.text} >Logged in as {currentUser?.username}</Typography>
+      <Button variant='outlined' onClick={handleLogout}>
         Logout
       </Button>
-    </>
+    </Paper>
   );
 };
 

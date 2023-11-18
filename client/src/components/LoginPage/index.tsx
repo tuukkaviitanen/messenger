@@ -6,7 +6,7 @@ import RegisterForm from './RegisterForm';
 const styles: StyleSheet = {
   header: {
     textAlign: 'center',
-    my: 5
+    py: 5
   },
   container: {
     display: 'flex',

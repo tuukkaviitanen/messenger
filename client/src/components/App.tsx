@@ -10,6 +10,13 @@ import { localStorageKeys } from '../utils/constants';
 import { useEffect } from 'react';
 import { userWithTokenSchema } from '../validators/UserWithToken';
 import { setCurrentUser } from '../reducers/userSlicer';
+import { StyleSheet } from '../utils/types';
+
+const styles: StyleSheet = {
+  container: {
+    height: '100vh'
+  },
+};
 
 const App = () => {
   const currentUser = useAppSelector((state) => state.user.currentUser);
@@ -17,7 +24,9 @@ const App = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const localStorageUser = window.localStorage.getItem(localStorageKeys.currentUser);
+    const localStorageUser = window.localStorage.getItem(
+      localStorageKeys.currentUser
+    );
     if (!localStorageUser) return;
 
     const user = userWithTokenSchema.safeParse(JSON.parse(localStorageUser));
@@ -30,20 +39,24 @@ const App = () => {
     dispatch(setCurrentUser(user.data));
   }, [dispatch]);
 
-
   return (
     <>
-      <Container>
+      <Container sx={styles.container}>
         <Routes>
-          <Route path='/login' element={currentUser ?  <Navigate to='/' replace /> : <LoginPage />} />
+          <Route
+            path='/login'
+            element={currentUser ? <Navigate to='/' replace /> : <LoginPage />}
+          />
           <Route
             path='/*'
-            element={currentUser ? <ChatPage /> : <Navigate to='/login' replace />}
+            element={
+              currentUser ? <ChatPage /> : <Navigate to='/login' replace />
+            }
           />
           <Route path='*' element={<Navigate to='/' replace />} />
         </Routes>
       </Container>
-      <ToastContainer/>
+      <ToastContainer />
     </>
   );
 };
