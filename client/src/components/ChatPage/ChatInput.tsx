@@ -41,7 +41,7 @@ const ChatInput = ({handleSendMessage}: Params) => {
 
 	return (
 		<form onSubmit={formik.handleSubmit}>
-			<Paper elevation={10} sx={styles.container}>
+			<Paper id='chat-form' elevation={10} sx={styles.container}>
 				<TextField
 					sx={styles.textField}
 					value={formik.values.messageField}

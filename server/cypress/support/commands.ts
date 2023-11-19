@@ -51,9 +51,15 @@ Cypress.Commands.add('login', (username: string, password: string) => {
 	cy.get('#login-form').find('button').click();
 });
 
+Cypress.Commands.add('sendChat', (message: string) => {
+	cy.get('#chat-form').find('input').type(message);
+	cy.contains(/send/i).click();
+});
+
 declare namespace Cypress{
 	interface Chainable {
 		register(username: string, password: string): Chainable<void>;
 		login(username: string, password: string): Chainable<void>;
+		sendChat(message: string): Chainable<void>;
 	}
 }
