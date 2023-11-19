@@ -1,6 +1,11 @@
 import {z} from 'zod';
 
 export const userCredentialsSchema = z.object({
+	username: z.string(),
+	password: z.string(),
+});
+
+export const userCredentialsSchemaWithMinMax = z.object({
 	username: z.string().min(3).max(25),
 	password: z.string().min(8),
 });

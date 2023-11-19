@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/consistent-type-definitions */
+/* eslint-disable @typescript-eslint/no-namespace */
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference types="cypress" />
 // ***********************************************
@@ -36,3 +38,22 @@
 //     }
 //   }
 // }
+
+Cypress.Commands.add('register', (username: string, password: string) => {
+	cy.get('#registration-form').find('input:first').type(username);
+	cy.get('#registration-form').find('input:last').type(password);
+	cy.get('#registration-form').find('button').click();
+});
+
+Cypress.Commands.add('login', (username: string, password: string) => {
+	cy.get('#login-form').find('input:first').type(username);
+	cy.get('#login-form').find('input:last').type(password);
+	cy.get('#login-form').find('button').click();
+});
+
+declare namespace Cypress{
+	interface Chainable {
+		register(username: string, password: string): Chainable<void>;
+		login(username: string, password: string): Chainable<void>;
+	}
+}

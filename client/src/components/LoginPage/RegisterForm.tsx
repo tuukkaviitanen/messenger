@@ -9,7 +9,7 @@ import {Box} from '@mui/material';
 
 const RegisterForm = () => {
 	const validationSchema = yup.object({
-		username: yup.string().required('Username is required').min(8),
+		username: yup.string().required('Username is required').min(3).max(25),
 		password: yup.string().required('Password is required').min(8),
 	});
 
