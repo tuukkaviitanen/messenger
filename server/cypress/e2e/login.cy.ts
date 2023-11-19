@@ -43,6 +43,10 @@ describe('login page', () => {
 			cy.login('TestUsername', 'TestPassword');
 
 			cy.contains(/logged in as TestUsername/i);
+
+			cy.contains(/logout/i).click();
+
+			cy.contains(/welcome to messenger/i);
 		});
 
 		it('shows error when invalid password', () => {

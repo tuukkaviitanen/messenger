@@ -58,7 +58,7 @@ const App = () => {
 					<Route path='*' element={<Navigate to='/' replace />} />
 				</Routes>
 			</Container>
-			<ToastContainer />
+			<ToastContainer position='top-center' />
 		</>
 	);
 };
