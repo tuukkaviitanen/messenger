@@ -4,13 +4,14 @@ import usersRouter from './controllers/users';
 import {errorHandler, parseToken} from './utils/middleware';
 import loginRouter from './controllers/login';
 import path from 'path';
+import config from './utils/config';
 
 const app = express();
 app.use(express.json());
 
 app.use(parseToken);
 
-app.use(express.static(path.join(__dirname, '../../client/dist')))
+app.use(express.static(path.join(__dirname, config.clientDistPath)))
 
 app.use('/api/users', usersRouter);
 
@@ -22,7 +23,7 @@ app.use(errorHandler);
 
 // Handles any requests that don't match the ones above
 app.get('*', (req,res) =>{
-  res.sendFile(path.join(path.join(__dirname, '../../client/dist/index.html')));
+  res.sendFile(path.join(path.join(__dirname, config.clientDistPath, 'index.html')));
 });
 
 export default app;
