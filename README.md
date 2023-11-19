@@ -2,6 +2,10 @@
 
 <b>IN PROGRESS</b>
 
+LIVE ON RENDER: https://messenger-app-3ztg.onrender.com.
+Running as a free tier service so it might take some time to start up.
+
+
 Full Stack application using Node backend and React frontend.
 
 Project is built with TypeScript.
