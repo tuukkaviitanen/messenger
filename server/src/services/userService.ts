@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 
 import {type UserPublic} from '../validators/UserPublic';
 import {type UserCredentials} from '../validators/UserCredentials';
-import {AuthenticationError} from '../customErrors';
+import {AuthenticationError} from '../utils/customErrors';
 import {type User} from '../database/models/User';
 import {userTable} from '../database';
 import config from '../utils/config';

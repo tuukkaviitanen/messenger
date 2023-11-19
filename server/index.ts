@@ -1,16 +1,13 @@
-
-import app from './src/app';
 import {connectToDatabase} from './src/database';
 import config from './src/utils/config';
 import logger from './src/utils/logger';
-
-const port = Number(config.port) || 3000;
+import server from './src/server';
 
 const start = async () => {
 	await connectToDatabase();
 
-	app.listen(port, () => {
-		logger.info(`Express server listening on port ${port}`);
+	server.listen(config.port, () => {
+		logger.info(`Express server listening on port ${config.port}`);
 	});
 };
 

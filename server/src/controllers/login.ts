@@ -9,7 +9,7 @@ loginRouter.post('/', async (req, res) => {
 
 	const token = await userService.getToken(userCredentials);
 
-	return res.json({token});
+	return res.json({token, username: userCredentials.username});
 });
 
 export default loginRouter;

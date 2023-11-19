@@ -3,11 +3,11 @@ import {ZodError} from 'zod';
 import {fromZodError} from 'zod-validation-error';
 import {AuthenticationError} from './customErrors';
 import jwt from 'jsonwebtoken';
-import {userPublicSchema} from './validators/UserPublic';
+import {userPublicSchema} from '../validators/UserPublic';
 import {type RequestWithUser} from './types';
-import config from './utils/config';
+import config from './config';
 import {DatabaseError, UniqueConstraintError} from 'sequelize';
-import logger from './utils/logger';
+import logger from './logger';
 
 export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next) => {
 	if (error instanceof ZodError) {

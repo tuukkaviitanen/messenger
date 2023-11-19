@@ -1,7 +1,7 @@
 import {Router as createRouter} from 'express';
 
 import userService from '../services/userService';
-import {userCredentialsSchema} from '../validators/UserCredentials';
+import {userCredentialsSchemaWithMinMax} from '../validators/UserCredentials';
 
 const usersRouter = createRouter();
 
@@ -17,7 +17,7 @@ usersRouter.get('/:id', async (req, res) => {
 });
 
 usersRouter.post('/', async (req, res) => {
-	const userCredentials = userCredentialsSchema.parse(req.body);
+	const userCredentials = userCredentialsSchemaWithMinMax.parse(req.body);
 
 	const user = await userService.create(userCredentials);
 
