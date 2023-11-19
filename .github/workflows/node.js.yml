@@ -10,7 +10,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-backend:
+  build:
 
     runs-on: ubuntu-latest
 
@@ -86,3 +86,35 @@ jobs:
         start: npm run start:test
         wait-on: http://localhost:3000
         working-directory: ./server
+
+  tag_release:
+    needs: [build]
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.67.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch
+
+  deployment:
+    needs: [build, tag_release]
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'push' }}
+    steps:
+      - name: Deploy to Render
+        if: ${{ github.event_name == 'push' }}
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
+      - name: Wait for Render Deployment
+        uses: bounceapp/render-action@0.7.1
+        with:
+          render-token: ${{ secrets.RENDER_API_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}
