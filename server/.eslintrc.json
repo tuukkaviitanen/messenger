@@ -1,7 +1,9 @@
 {
     "env": {
         "es2021": true,
-        "node": true
+        "node": true,
+        "jest/globals": true,
+        "cypress/globals": true
     },
     "extends": "xo",
     "overrides": [
@@ -19,7 +21,7 @@
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
-    "plugins": ["unused-imports"],
+    "plugins": ["unused-imports", "jest", "cypress"],
     "rules": {
         "no-console":"error",
         "unused-imports/no-unused-imports": "error"

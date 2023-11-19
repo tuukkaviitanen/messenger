@@ -7,6 +7,8 @@ import app from '../app';
 import supertest from 'supertest';
 import {sequelize, userTable} from '../database';
 
+import { expect } from '@jest/globals';
+
 describe('WebSocket events', () => {
 	let clientSocket: ClientSocket;
 	let httpServer: HttpServer;
