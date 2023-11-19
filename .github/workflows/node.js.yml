@@ -78,7 +78,7 @@ jobs:
       working-directory: ./client
 
     - name: Run end-to-end tests
-      uses: cypress-io/github-action@v5
+      uses: cypress-io/github-action@v6
       env:
         CYPRESS_BASE_URL: http://localhost:3000
       with:
