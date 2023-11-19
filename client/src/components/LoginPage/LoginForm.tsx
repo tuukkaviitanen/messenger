@@ -7,6 +7,7 @@ import {toast} from 'react-toastify';
 import axios from 'axios';
 import {type ExpectedAxiosErrorResponse} from '../../utils/types';
 import {useAppDispatch} from '../../hooks/typedReduxHooks';
+import {Box} from '@mui/material';
 
 const LoginForm = () => {
 	const dispatch = useAppDispatch();
@@ -49,11 +50,14 @@ const LoginForm = () => {
 	};
 
 	return (
-		<FormBase
-			header='Login'
-			validationSchema={validationSchema}
-			onSubmit={onSubmit}
-		/>
+		<Box id='login-form'>
+			<FormBase
+				header='Login'
+				validationSchema={validationSchema}
+				onSubmit={onSubmit}
+			/>
+		</Box>
+
 	);
 };
 

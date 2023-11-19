@@ -5,6 +5,7 @@ import userService from '../../services/userService';
 import {toast} from 'react-toastify';
 import axios from 'axios';
 import {type ExpectedAxiosErrorResponse} from '../../utils/types';
+import {Box} from '@mui/material';
 
 const RegisterForm = () => {
 	const validationSchema = yup.object({
@@ -45,11 +46,13 @@ const RegisterForm = () => {
 	};
 
 	return (
-		<FormBase
-			header='Register'
-			validationSchema={validationSchema}
-			onSubmit={onSubmit}
-		/>
+		<Box id='registration-form'>
+			<FormBase
+				header='Register'
+				validationSchema={validationSchema}
+				onSubmit={onSubmit}
+			/>
+		</Box>
 	);
 };
 
