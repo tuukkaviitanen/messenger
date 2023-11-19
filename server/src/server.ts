@@ -9,11 +9,7 @@ import {type UserPublic, userPublicSchema} from './validators/UserPublic';
 const server = createServer(app);
 
 export const attachSocketServerTo = (httpServer: HttpServer) => {
-	const io = new Server(httpServer, {
-		cors: {
-			origin: 'http://localhost:5173',
-		},
-	});
+	const io = new Server(httpServer);
 
 	const parseUserFromToken = (token: string) => {
 		const decodedToken: unknown = jwt.verify(token, config.jwtSecret);

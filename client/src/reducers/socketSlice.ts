@@ -19,7 +19,7 @@ const socketSlice = createSlice({
 	reducers: {
 		startConnection(_state, action: PayloadAction<Payload>) {
 			const {token} = action.payload;
-			const newSocket = io('http://localhost:3000', {auth: {token}});
+			const newSocket = io({auth: {token}});
 			return {connection: newSocket};
 		},
 		closeConnection(state) {
