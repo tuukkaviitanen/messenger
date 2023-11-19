@@ -3,7 +3,7 @@ import supertest from 'supertest';
 import app from '../app';
 import {userTable, sequelize} from '../database';
 
-import { expect } from '@jest/globals';
+import {expect} from '@jest/globals';
 
 const api = supertest(app);
 

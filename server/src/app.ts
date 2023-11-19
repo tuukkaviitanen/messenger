@@ -11,7 +11,7 @@ app.use(express.json());
 
 app.use(parseToken);
 
-app.use(express.static(path.join(__dirname, config.clientDistPath)))
+app.use(express.static(path.join(__dirname, config.clientDistPath)));
 
 app.use('/api/users', usersRouter);
 
@@ -22,8 +22,8 @@ app.get('/api/healthz', (req, res) => res.send('ok'));
 app.use(errorHandler);
 
 // Handles any requests that don't match the ones above
-app.get('*', (req,res) =>{
-  res.sendFile(path.join(__dirname, config.clientDistPath, 'index.html'));
+app.get('*', (req, res) => {
+	res.sendFile(path.join(__dirname, config.clientDistPath, 'index.html'));
 });
 
 export default app;

@@ -14,7 +14,7 @@ const nodeEnv = process.env.NODE_ENV;
 
 const postgresUrl = (nodeEnv === 'test') ? postgresUrlTesting : postgresUrlProduction;
 
-const clientDistPath = nodeEnv === 'production' ? '../../../client/dist' : '../../client/dist'
+const clientDistPath = nodeEnv === 'development' ? '../../client/dist' : '../../../client/dist';
 
 if (!jwtSecret || !postgresUrl || !nodeEnv) {
 	logger.error('All required env variables are not set!');
