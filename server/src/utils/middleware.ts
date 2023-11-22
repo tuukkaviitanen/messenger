@@ -13,12 +13,12 @@ import {type Socket} from 'socket.io';
 export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next) => {
 	if (error instanceof ZodError) {
 		const {message} = fromZodError(error);
-		logger.info(message);
+		logger.log(message);
 		return res.status(400).json({error: message});
 	}
 
 	if (error instanceof AuthenticationError) {
-		logger.info(error.message);
+		logger.log(error.message);
 		return res.status(401).json({error: error.message});
 	}
 
@@ -27,7 +27,7 @@ export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next
 
 		const errorMessages = fieldKeys.map(key => `${key} '${error.fields[key] as string}' is already in use`);
 
-		logger.info(errorMessages);
+		logger.log(errorMessages);
 		return res.status(400).json({error: errorMessages.join(', ')});
 	}
 

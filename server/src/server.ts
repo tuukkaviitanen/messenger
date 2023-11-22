@@ -52,7 +52,7 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 
 		addUser(user);
 
-		logger.info(`socket ${socket.id} connected as user ${user.username}`);
+		logger.log(`socket ${socket.id} connected as user ${user.username}`);
 		socket.broadcast.emit(
 			...createMessageEvent({
 				sender: user.username,
@@ -91,7 +91,7 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 		});
 
 		socket.on(SocketEvent.Disconnect, () => {
-			logger.info(`${user.username} disconnected`);
+			logger.log(`${user.username} disconnected`);
 			socket.broadcast.emit(
 				...createMessageEvent({
 					sender: user.username,
