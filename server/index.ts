@@ -7,7 +7,7 @@ const start = async () => {
 	await connectToDatabase();
 
 	server.listen(config.port, () => {
-		logger.log(`Express server listening on port ${config.port}`);
+		logger.info(`Express server listening on port ${config.port}`);
 	});
 };
 
