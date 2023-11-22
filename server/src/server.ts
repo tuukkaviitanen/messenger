@@ -23,6 +23,8 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 		user: UserPublic;
 	} & Socket;
 
+	let connectedUsers: UserPublic[] = [];
+
 	io.use((socket, next) => {
 		const {token} = socket.handshake.auth;
 
@@ -60,8 +62,11 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 		const {user} = (socket as SocketWithUser);
 		await socket.join(user.id);
 
+		connectedUsers = connectedUsers.find(u => u.id === user.id) === undefined ? connectedUsers.concat(user) : connectedUsers;
+
 		logger.info(`socket ${socket.id} connected as user ${user.username}`);
 		socket.broadcast.emit(SocketEvent.Message, {sender: user.username, message: 'joined the chat', timestamp: new Date()});
+		socket.emit(SocketEvent.Message, {sender: 'server', message: `Welcome to the messenger app. Users currently online: ${connectedUsers.map(u => u.username).join(', ')}`, timestamp: new Date()});
 
 		socket.on(SocketEvent.Message, (message: string) => {
 			logger.info(`message received from ${socket.id}`, message);
@@ -71,6 +76,7 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 		socket.on(SocketEvent.Disconnect, () => {
 			logger.info(`${user.username} disconnected`);
 			socket.broadcast.emit(SocketEvent.Message, {sender: user.username, message: 'left the chat', timestamp: new Date()});
+			connectedUsers = connectedUsers.filter(u => u.id !== user.id);
 		});
 	});
 

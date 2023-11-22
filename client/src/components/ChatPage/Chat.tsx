@@ -70,7 +70,7 @@ const Chat = () => {
 		socket.on(SocketEvent.ConnectionError, error => {
 			setMessages([
 				...messages,
-				{sender: 'server', message: error.message, timestamp: new Date()},
+				{sender: 'connection', message: error.message, timestamp: new Date()},
 			]);
 		});
 
