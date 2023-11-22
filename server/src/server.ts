@@ -49,10 +49,7 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 		const {user} = socket as SocketWithUser;
 		await socket.join(user.id);
 
-		connectedUsers
-			= connectedUsers.find(u => u.id === user.id) === undefined
-				? connectedUsers.concat(user)
-				: connectedUsers;
+		addUser(user);
 
 		logger.info(`socket ${socket.id} connected as user ${user.username}`);
 		socket.broadcast.emit(

@@ -3,7 +3,7 @@ import {
 	ListItem,
 	Typography,
 } from '@mui/material';
-import {type Message, type StyleSheet} from '../../utils/types';
+import {SocketEvent, type Message, type StyleSheet} from '../../utils/types';
 import {useState, useCallback, useEffect} from 'react';
 import {useAppSelector} from '../../hooks/typedReduxHooks';
 import ChatInput, {type OnSubmit} from './ChatInput';
@@ -41,11 +41,6 @@ const Chat = () => {
 		}
 	}, []);
 
-	enum SocketEvent {
-		Message = 'message',
-		ConnectionError = 'connect_error',
-	}
-
 	type MessageContent = {
 		sender: string;
 		message: string;
@@ -53,11 +48,7 @@ const Chat = () => {
 	};
 
 	useEffect(() => {
-		if (!socket) {
-			return;
-		}
-
-		socket.on(
+		socket?.on(
 			SocketEvent.Message,
 			({sender, message, timestamp}: MessageContent) => {
 				setMessages([
@@ -67,7 +58,7 @@ const Chat = () => {
 			},
 		);
 
-		socket.on(SocketEvent.ConnectionError, error => {
+		socket?.on(SocketEvent.ConnectionError, error => {
 			setMessages([
 				...messages,
 				{sender: 'connection', message: error.message, timestamp: new Date()},
@@ -75,10 +66,10 @@ const Chat = () => {
 		});
 
 		return () => {
-			socket.off(SocketEvent.Message);
-			socket.off(SocketEvent.ConnectionError);
+			socket?.off(SocketEvent.Message);
+			socket?.off(SocketEvent.ConnectionError);
 		};
-	}, [socket, SocketEvent, messages]);
+	}, [socket, messages]);
 
 	const handleSendMessage: OnSubmit = ({messageField}, {resetForm}) => {
 		socket?.emit(SocketEvent.Message, messageField);
