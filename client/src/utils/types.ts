@@ -27,3 +27,8 @@ export enum SocketEvent {
 	ConnectionError = 'connect_error',
 	Users = 'users',
 }
+
+export type Chat = {
+	recipients?: User[];
+	messages: Message[];
+};

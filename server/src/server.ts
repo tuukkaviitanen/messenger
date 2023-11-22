@@ -23,6 +23,7 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 	type MessageContent = {
 		sender: string;
 		message: string;
+		recipients?: UserPublic[];
 		timestamp: Date;
 	};
 
@@ -67,15 +68,26 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 			}),
 		);
 
-		socket.on(SocketEvent.Message, (message: string) => {
-			logger.info(`message received from ${socket.id}`, message);
-			io.emit(
-				...createMessageEvent({
-					sender: user.username,
-					message,
-				}),
-			);
-			addUser(user);
+		socket.on(SocketEvent.Message, ({message, recipients}: {message: string; recipients?: UserPublic[]}) => {
+			if (recipients) {
+				recipients.push(user);
+				recipients.forEach(recipient =>
+					io.to(recipient.id).emit(
+						...createMessageEvent({
+							sender: user.username,
+							message,
+							recipients: [...recipients.filter(r => r.id !== recipient.id)],
+						}),
+					),
+				);
+			} else {
+				io.emit(
+					...createMessageEvent({
+						sender: user.username,
+						message,
+					}),
+				);
+			}
 		});
 
 		socket.on(SocketEvent.Disconnect, () => {

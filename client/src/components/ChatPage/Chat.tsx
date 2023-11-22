@@ -3,10 +3,11 @@ import {
 	ListItem,
 	Typography,
 } from '@mui/material';
-import {SocketEvent, type Message, type StyleSheet} from '../../utils/types';
-import {useState, useCallback, useEffect} from 'react';
-import {useAppSelector} from '../../hooks/typedReduxHooks';
+import {SocketEvent, type StyleSheet, type User} from '../../utils/types';
+import {useCallback, useEffect} from 'react';
+import {useAppDispatch, useAppSelector} from '../../hooks/typedReduxHooks';
 import ChatInput, {type OnSubmit} from './ChatInput';
+import {addMessage} from '../../reducers/chatSlice';
 
 const styles: StyleSheet = {
 	container: {
@@ -30,7 +31,15 @@ const styles: StyleSheet = {
 };
 
 const Chat = () => {
-	const [messages, setMessages] = useState<Message[]>([]);
+	const dispatch = useAppDispatch();
+
+	const selectedChatIndex = useAppSelector(state => state.chat.selectedChatIndex);
+
+	const chats = useAppSelector(state => state.chat.chats);
+
+	const chat = chats[selectedChatIndex];
+
+	const {messages} = chat;
 
 	const socket = useAppSelector(state => state.socket.connection);
 
@@ -44,35 +53,30 @@ const Chat = () => {
 	type MessageContent = {
 		sender: string;
 		message: string;
+		recipients?: User[];
 		timestamp: string;
 	};
 
 	useEffect(() => {
 		socket?.on(
 			SocketEvent.Message,
-			({sender, message, timestamp}: MessageContent) => {
-				setMessages([
-					...messages,
-					{sender, message, timestamp: new Date(timestamp)},
-				]);
+			({sender, message, timestamp, recipients}: MessageContent) => {
+				dispatch(addMessage({message: {message, sender, timestamp: new Date(timestamp)}, recipients}));
 			},
 		);
 
 		socket?.on(SocketEvent.ConnectionError, error => {
-			setMessages([
-				...messages,
-				{sender: 'connection', message: error.message, timestamp: new Date()},
-			]);
+			dispatch(addMessage({message: {message: error.message, sender: 'connection', timestamp: new Date()}}));
 		});
 
 		return () => {
 			socket?.off(SocketEvent.Message);
 			socket?.off(SocketEvent.ConnectionError);
 		};
-	}, [socket, messages]);
+	}, [socket, messages, dispatch]);
 
 	const handleSendMessage: OnSubmit = ({messageField}, {resetForm}) => {
-		socket?.emit(SocketEvent.Message, messageField);
+		socket?.emit(SocketEvent.Message, {message: messageField, recipients: chat.recipients});
 		resetForm();
 	};
 

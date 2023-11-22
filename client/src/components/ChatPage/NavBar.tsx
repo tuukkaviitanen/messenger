@@ -1,8 +1,10 @@
-import {Box, Button, ListItem, Paper, Typography} from '@mui/material';
+import {Box, Button, Paper, Typography, ListItemButton} from '@mui/material';
 import {removeCurrentUser} from '../../reducers/userSlicer';
 import {useAppDispatch, useAppSelector} from '../../hooks/typedReduxHooks';
 import {type User, type StyleSheet, SocketEvent} from '../../utils/types';
 import {useEffect, useState} from 'react';
+import {addChat, setSelectedChatIndex} from '../../reducers/chatSlice';
+import {usersArrayEqual} from '../../utils/helpers';
 
 const styles: StyleSheet = {
 	container: {
@@ -50,8 +52,20 @@ const NavBar = () => {
 	const socket = useAppSelector(state => state.socket.connection);
 	const [connectedUsers, setConnectedUsers] = useState<User[]>([]);
 
+	const chats = useAppSelector(state => state.chat.chats);
+
 	const handleLogout = () => {
 		dispatch(removeCurrentUser());
+	};
+
+	const handleChatChange = (index: number) => {
+		dispatch(setSelectedChatIndex(index));
+	};
+
+	const handleNewChat = (user: User) => {
+		if (!chats.find(c => usersArrayEqual(c.recipients, [user]))) { // If chat is NOT already created
+			dispatch(addChat({chat: {messages: [], recipients: [user]}}));
+		}
 	};
 
 	useEffect(() => {
@@ -76,10 +90,12 @@ const NavBar = () => {
 			<Box sx={styles.roomsContainer}>
 				<Typography variant='h5'>Chats</Typography>
 				<Box sx={styles.roomsList}>
-					<ListItem><Typography>Rooms come here</Typography></ListItem>
-					<ListItem><Typography>Rooms come here</Typography></ListItem>
-					<ListItem><Typography>Rooms come here</Typography></ListItem>
-					<ListItem><Typography>Rooms come here</Typography></ListItem>
+					{chats.map((c, index) => {
+						const name = c.recipients?.map(r => r.username).join(', ') ?? 'Global chat';
+						return (<ListItemButton onClick={() => {
+							handleChatChange(index);
+						}} key={name}><Typography>{name}</Typography></ListItemButton>);
+					})}
 				</Box>
 
 			</Box>
@@ -87,7 +103,9 @@ const NavBar = () => {
 			<Paper sx={styles.usersContainer}>
 				<Typography variant='h5'>Users online</Typography>
 				<Box sx={styles.usersList}>
-					{connectedUsers.map(u => <Typography key={u.id}>{u.username}</Typography>)}
+					{connectedUsers.map(u => <ListItemButton key={u.id} onClick={() => {
+						handleNewChat(u);
+					}} disabled={u.username === currentUser?.username}> <Typography>{u.username}</Typography></ListItemButton>)}
 
 				</Box>
 
