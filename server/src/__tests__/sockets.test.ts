@@ -83,7 +83,7 @@ describe('WebSocket events', () => {
 				done();
 			});
 
-			clientSocket.emit('message', message);
+			clientSocket.emit('message', {message});
 		});
 	});
 });
