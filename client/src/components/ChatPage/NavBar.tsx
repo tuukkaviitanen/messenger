@@ -53,6 +53,7 @@ const NavBar = () => {
 	const [connectedUsers, setConnectedUsers] = useState<User[]>([]);
 
 	const chats = useAppSelector(state => state.chat.chats);
+	const selectedChatIndex = useAppSelector(state => state.chat.selectedChatIndex);
 
 	const handleLogout = () => {
 		dispatch(removeCurrentUser());
@@ -63,8 +64,13 @@ const NavBar = () => {
 	};
 
 	const handleNewChat = (user: User) => {
-		if (!chats.find(c => usersArrayEqual(c.recipients, [user]))) { // If chat is NOT already created
+		const chatIndex = chats.findIndex(c => usersArrayEqual(c.recipients, [user]));
+
+		if (chatIndex === -1) { // If chat is NOT already created
 			dispatch(addChat({chat: {messages: [], recipients: [user]}}));
+			handleChatChange(chats.length);
+		} else { // Chat is already create
+			handleChatChange(chatIndex);
 		}
 	};
 
@@ -94,7 +100,7 @@ const NavBar = () => {
 						const name = c.recipients?.map(r => r.username).join(', ') ?? 'Global chat';
 						return (<ListItemButton onClick={() => {
 							handleChatChange(index);
-						}} key={name}><Typography>{name}</Typography></ListItemButton>);
+						}} key={name} selected={index === selectedChatIndex}><Typography>{name}</Typography></ListItemButton>);
 					})}
 				</Box>
 
