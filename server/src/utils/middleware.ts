@@ -4,10 +4,11 @@ import {fromZodError} from 'zod-validation-error';
 import {AuthenticationError} from './customErrors';
 import jwt from 'jsonwebtoken';
 import {userPublicSchema} from '../validators/UserPublic';
-import {type RequestWithUser} from './types';
+import {type SocketWithUser, type RequestWithUser} from './types';
 import config from './config';
 import {DatabaseError, UniqueConstraintError} from 'sequelize';
 import logger from './logger';
+import {type Socket} from 'socket.io';
 
 export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next) => {
 	if (error instanceof ZodError) {
@@ -43,14 +44,20 @@ export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next
 	next(error);
 };
 
+const parseUserFromToken = (token: string) => {
+	const decodedToken: unknown = jwt.verify(token, config.jwtSecret);
+
+	const user = userPublicSchema.parse(decodedToken);
+
+	return user;
+};
+
 export const parseToken = (req: RequestWithUser, res: Response, next: NextFunction) => {
 	const token = req.headers.authorization?.replace(/^bearer /i, '');
 
 	if (token) {
 		try {
-			const decodedToken: unknown = jwt.verify(token, config.jwtSecret);
-
-			const user = userPublicSchema.parse(decodedToken);
+			const user = parseUserFromToken(token);
 
 			req.user = user;
 		} catch (error) {
@@ -60,4 +67,25 @@ export const parseToken = (req: RequestWithUser, res: Response, next: NextFuncti
 	}
 
 	next();
+};
+
+export const tokenParserMiddleware = (socket: Socket, next: (err?: Error) => void) => {
+	const {token} = socket.handshake.auth;
+
+	if (!token) {
+		next(new Error('Token is required'));
+		return;
+	}
+
+	if (typeof token !== 'string') {
+		next(new Error('Token in invalid format'));
+		return;
+	}
+
+	try {
+		(socket as SocketWithUser).user = parseUserFromToken(token);
+		next();
+	} catch (ex) {
+		next(new Error('Token invalid'));
+	}
 };
