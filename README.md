@@ -18,12 +18,11 @@ REST API is used for user management and websockets are used to transport messag
 Project is built with TypeScript.
 [Zod](https://zod.dev/)-library is used to validate all inbound data at runtime as TypeScript types exist only until it is compiled into JavaScript. ESLint is used to enforce coding-style and format. Both frontend and backend ESLint setups are based on [XO](https://github.com/xojs/xo) rule set.
 
-
 ## CI/CD
 
 There is a Github Actions build workflow in place to lint, test & build the code. Everything is tested in pull requests so broken code doesn't get into main branch.
 
-The the CI pipeline consist of 3 jobs: 
+The the CI pipeline consist of 3 jobs:
 
 ### build
 
@@ -42,27 +41,25 @@ If build is successful, runs [github-tag-action](https://github.com/anothrNick/g
 If build and tagging are successful, deploys the main branch to [Render](https://render.com/) using [render-deploy-action](https://github.com/johnbeynon/render-deploy-action).
 After initializing the deployment, waits for deployment to finish successfully using [render-action](https://github.com/Bounceapp/render-action).
 
-
 ## Tests
 
 The project contains integration tests and end-to-end tests. All tests are currently located in the backend, but E2E tests test the frontend as well.
 
 ### Integration tests
 
-There are integration tests for REST API Endpoints and WebSocket events. 
+There are integration tests for REST API Endpoints and WebSocket events.
 
-These tests use the [Jest](https://jestjs.io/)-library for tests. 
-REST API endpoints are tested with [Supertest](https://github.com/ladjs/supertest#readme). 
+These tests use the [Jest](https://jestjs.io/)-library for tests.
+REST API endpoints are tested with [Supertest](https://github.com/ladjs/supertest#readme).
 Socket.io events are tested with Socket.io client in the backend.
 
 ### End-to-End tests
 
 E2E tests are done using [Cypress](https://docs.cypress.io/)
-E2E tests are run when the whole application is running. 
-Cypress opens a browser and tests the application more like a user would. All essential actions are tested. 
+E2E tests are run when the whole application is running.
+Cypress opens a browser and tests the application more like a user would. All essential actions are tested.
 
-E2E tests are important for the CI/CD pipeline. Finishing these tests successfully means that the application works as a whole, even when built in a different environment. 
-
+E2E tests are important for the CI/CD pipeline. Finishing these tests successfully means that the application works as a whole, even when built in a different environment.
 
 ## Backend
 
@@ -71,7 +68,6 @@ E2E tests are important for the CI/CD pipeline. Finishing these tests successful
 Backend runs an express server with `/api/users` and `/api/login` endpoints. Users can be created and single users can be fetched with id. Login returns a JsonWebToken that can be used for authentication in following requests.
 
 Users are stored in a [PostgreSQL](https://www.postgresql.org/) server through [Sequelize](https://sequelize.org/). Passwords are hashed and usernames are unique.
-
 
 ## Frontend
 
@@ -83,10 +79,11 @@ Full-Duplex connection to server is created using Socket.io. It primarily uses W
 
 [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) is not needed even when running the client in development mode as Vite is configured to proxy these connections to server port and to change the origin. This works for both HTTP- and WebSocket connections.
 
-
 # Planned
 
 - Private messages and group chats to chat client
+- Saving chats to database
+  - Maybe encryption of some kind
 - Full CRUD-actions to users in API
 - Containerizing the whole application using [Docker](https://www.docker.com/)
 - Component tests to frontend
@@ -97,35 +94,33 @@ Full-Duplex connection to server is created using Socket.io. It primarily uses W
 
 #### Node version
 
-The build process requires a least Node version 15.x or higher because of some dependencies. Some dependencies warn that to get the optimal performance, at least version 18.x is needed. 
+The build process requires a least Node version 15.x or higher because of some dependencies. Some dependencies warn that to get the optimal performance, at least version 18.x is needed.
 It's good to note that these are dev dependencies and running the built application in production might be possible with a lower version of node.
 
 The production version is running version 20.9.0.
-
 
 ### Backend
 
 1. Change to `/server` directory
 2. Run `npm install`
 3. Create `.env` file with required env variables
-  a. Check out `.env.template` for reference
-  b. This requires setting up a PostgreSQL database. You can use easily set up a docker container with instructions [here](https://stackoverflow.com/questions/37694987/connecting-to-postgresql-in-a-docker-container-from-outside) (this of course requires setting up Docker first)
-3. For the server to serve the client, client project needs to be built. Look for setup instructions below.
-4. Now you can run the application with following commands:
-  a. Run `npm run dev` for development with automatic reloading on save.
-  b. Run `npm run build` and `npm start` to build and run for production.
-  c. Run `npm test` for running tests
-  d. Run `npm start:test` to start server with `test` mode (required for E2E tests)
-  e. Run `npm test:e2e` to run End-to-End test while server is running in `test` mode
+   a. Check out `.env.template` for reference
+   b. This requires setting up a PostgreSQL database. You can use easily set up a docker container with instructions [here](https://stackoverflow.com/questions/37694987/connecting-to-postgresql-in-a-docker-container-from-outside) (this of course requires setting up Docker first)
+4. For the server to serve the client, client project needs to be built. Look for setup instructions below.
+5. Now you can run the application with following commands:
+   a. Run `npm run dev` for development with automatic reloading on save.
+   b. Run `npm run build` and `npm start` to build and run for production.
+   c. Run `npm test` for running tests
+   d. Run `npm start:test` to start server with `test` mode (required for E2E tests)
+   e. Run `npm test:e2e` to run End-to-End test while server is running in `test` mode
 
 ### Frontend
 
 1. Change to `/client` directory
 2. Run `npm install`
-4. Now you can run the application with following commands:
-  a. Run `npm run dev` for development with hot reload. Server still needs to be running.
-  b. Run `npm run build` to build static files. This needs to be done for the backend to start serving the client.
-
+3. Now you can run the application with following commands:
+   a. Run `npm run dev` for development with hot reload. Server still needs to be running.
+   b. Run `npm run build` to build static files. This needs to be done for the backend to start serving the client.
 
 ## Usage
 
@@ -134,6 +129,7 @@ The production version is running version 20.9.0.
 Endpoints:
 
 These URLs work when running locally and port is left to default (3000)
+
 ```
 Create user:
 POST http://localhost:3000/api/users
