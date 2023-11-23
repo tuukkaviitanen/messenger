@@ -2,9 +2,10 @@ import {configureStore} from '@reduxjs/toolkit';
 
 import userReducer from './reducers/userSlicer';
 import socketReducer from './reducers/socketSlice';
+import chatReducer from './reducers/chatSlice';
 
 const store = configureStore({
-	reducer: {user: userReducer, socket: socketReducer},
+	reducer: {user: userReducer, socket: socketReducer, chat: chatReducer},
 	middleware: getDefaultMiddleware => getDefaultMiddleware({serializableCheck: false}),
 });
 

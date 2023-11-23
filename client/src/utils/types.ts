@@ -21,3 +21,14 @@ export type Message = {
 	message: string;
 	timestamp: Date;
 };
+
+export enum SocketEvent {
+	Message = 'message',
+	ConnectionError = 'connect_error',
+	Users = 'users',
+}
+
+export type Chat = {
+	recipients?: User[];
+	messages: Message[];
+};

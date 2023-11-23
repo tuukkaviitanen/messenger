@@ -58,6 +58,10 @@ describe('WebSocket events', () => {
 		});
 	});
 
+	afterEach(() => {
+		clientSocket.off();
+	});
+
 	afterAll(async () => {
 		clientSocket.disconnect();
 		io.close();
@@ -75,15 +79,14 @@ describe('WebSocket events', () => {
 				expect(args).toHaveProperty('timestamp');
 				expect(args.message).toBe(message);
 				expect(args.sender).toBe('hellouser');
-				expect(typeof args.sender === 'string').toBe(true);
+				expect(typeof args.timestamp === 'string').toBe(true);
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				expect(Date.parse(args.timestamp) / 1000).toBeCloseTo(new Date().getTime() / 1000, 0);
 
-				clientSocket.close();
 				done();
 			});
 
-			clientSocket.emit('message', message);
+			clientSocket.emit('message', {message});
 		});
 	});
 });
