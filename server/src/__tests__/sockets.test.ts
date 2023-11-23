@@ -58,6 +58,10 @@ describe('WebSocket events', () => {
 		});
 	});
 
+	afterEach(() => {
+		clientSocket.off();
+	});
+
 	afterAll(async () => {
 		clientSocket.disconnect();
 		io.close();
@@ -79,7 +83,6 @@ describe('WebSocket events', () => {
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				expect(Date.parse(args.timestamp) / 1000).toBeCloseTo(new Date().getTime() / 1000, 0);
 
-				clientSocket.close();
 				done();
 			});
 
