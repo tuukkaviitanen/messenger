@@ -5,6 +5,7 @@ import logger from './utils/logger';
 import {type UserPublic} from './validators/UserPublic';
 import {tokenParserMiddleware} from './utils/middleware';
 import {type SocketWithUser} from './utils/types';
+import config from './utils/config';
 
 const server = createServer(app);
 
@@ -31,7 +32,8 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 		content: Omit<MessageContent, 'timestamp'>,
 	): [string, MessageContent] => [SocketEvent.Message, {...content, timestamp: new Date()}];
 
-	let connectedUsers: UserPublic[] = [];
+	// In test mode, initial user is created
+	let connectedUsers: UserPublic[] = (config.nodeEnv === 'test') ? [{id: '9c5b94b1-35ad-49bb-b118-8e8fc24abf8', username: 'initial-user'}] : [];
 
 	const addUser = (user: UserPublic) => {
 		connectedUsers

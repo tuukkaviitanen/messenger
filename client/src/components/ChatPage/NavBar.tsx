@@ -93,7 +93,7 @@ const NavBar = () => {
 				</Button>
 			</Box>
 
-			<Box sx={styles.roomsContainer}>
+			<Box id='chats-container' sx={styles.roomsContainer}>
 				<Typography variant='h5'>Chats</Typography>
 				<Box sx={styles.roomsList}>
 					{chats.map((c, index) => {
@@ -106,7 +106,7 @@ const NavBar = () => {
 
 			</Box>
 
-			<Paper sx={styles.usersContainer}>
+			<Paper id='users-container' sx={styles.usersContainer}>
 				<Typography variant='h5'>Users online</Typography>
 				<Box sx={styles.usersList}>
 					{connectedUsers.map(u => <ListItemButton key={u.id} onClick={() => {
