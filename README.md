@@ -1,6 +1,6 @@
 # Messenger application
 
-> Full Stack chat application using Node backend and React frontend.
+> Full Stack chat application using Node backend and React frontend. Currently includes a global chatroom and private chats.
 
 <b>IN PROGRESS</b>
 
@@ -81,7 +81,8 @@ Full-Duplex connection to server is created using Socket.io. It primarily uses W
 
 # Planned
 
-- Private messages and group chats to chat client
+- Group chats to chat client
+- Testing with multiple clients
 - Saving chats to database
   - Maybe encryption of some kind
 - Full CRUD-actions to users in API
@@ -151,4 +152,4 @@ When running frontend separately in dev mode, client should be accessed in a sep
 
 When running only the server, client can be accessed at the root path of the server URL.
 
-Users can be created on the login page and after logging in, user enters the chatroom automatically.
+Users can be created on the login page and after logging in, user enters the chatroom automatically. Online users can be clicked to open a private chat with them.
