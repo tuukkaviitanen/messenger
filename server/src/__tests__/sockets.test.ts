@@ -70,7 +70,7 @@ const assertServerEventContent = (args: any, expectedMessage: string) => {
 	expect((args.message as string)).toBe(expectedMessage);
 };
 
-describe('WebSocket events', () => {
+describe('websocket events', () => {
 	let clientSocket: ClientSocket;
 	let secondClientSocket: ClientSocket;
 	let httpServer: HttpServer;
@@ -128,7 +128,7 @@ describe('WebSocket events', () => {
 	});
 
 	describe('message', () => {
-		it('Should return message sent with sender username and timestamp string', done => {
+		it('should receive correct message when sent to global chat', done => {
 			const message = 'testmessage';
 
 			clientSocket.on('message', args => {
@@ -139,7 +139,7 @@ describe('WebSocket events', () => {
 			clientSocket.emit('message', {message});
 		});
 
-		it('Should return message sent with sender username and timestamp string (second client)', done => {
+		it('should receive correct message when sent to global chat (second client)', done => {
 			const message = 'testmessage';
 
 			secondClientSocket.connect();
@@ -153,7 +153,7 @@ describe('WebSocket events', () => {
 			secondClientSocket.emit('message', {message});
 		});
 
-		it('Should get message from other clients in global chat', done => {
+		it('should receive message from other clients in global chat', done => {
 			const message = 'testmessage';
 
 			secondClientSocket.on('message', args => {
@@ -171,7 +171,7 @@ describe('WebSocket events', () => {
 	});
 
 	describe('server-event', () => {
-		it('Should send welcome-message on connect', done => {
+		it('should receive welcome message on connect', done => {
 			secondClientSocket.on('server-event', args => {
 				assertServerEventContent(args, 'Welcome to the messenger app. Users currently online: initial-user, test user 1, test user 2');
 				done();
@@ -180,7 +180,7 @@ describe('WebSocket events', () => {
 			secondClientSocket.connect();
 		});
 
-		it('Should send joined message when another user connects', done => {
+		it('should receive joined message when another user connects', done => {
 			clientSocket.on('server-event', args => {
 				assertServerEventContent(args, 'test user 2 joined the chat');
 				done();
@@ -189,7 +189,7 @@ describe('WebSocket events', () => {
 			secondClientSocket.connect();
 		});
 
-		it('Should send left message when another user disconnects', done => {
+		it('should receive left message when another user disconnects', done => {
 			clientSocket.on('server-event', args => {
 				if (args.message === 'test user 2 joined the chat') {
 					return;
@@ -207,7 +207,7 @@ describe('WebSocket events', () => {
 	});
 
 	describe('private messages', () => {
-		it('Should send message to recipient', done => {
+		it('should send message to recipient', done => {
 			const message = 'private message test';
 			const recipients = [{username: users[0].username, id: users[0].id!}];
 
@@ -230,7 +230,7 @@ describe('WebSocket events', () => {
 			}, 500);
 		});
 
-		it('Should NOT send message to other than recipient', done => {
+		it('should NOT send message to other than recipient', done => {
 			const message = 'private message test';
 			const recipients = [{username: 'initial-user', id: 'test-id'}];
 
