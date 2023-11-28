@@ -40,6 +40,17 @@ const createUser = async (api: supertest.SuperTest<supertest.Test>, userInfo: Us
 	userInfo.token = (response.body.token as string);
 };
 
+const assertMessageContent = (args: any, expectedMessage: string, expectedUser: string) => {
+	expect(args).toHaveProperty('message');
+	expect(args).toHaveProperty('sender');
+	expect(args).toHaveProperty('timestamp');
+	expect(args.message).toBe(expectedMessage);
+	expect(args.sender).toBe(expectedUser);
+	expect(typeof args.timestamp === 'string').toBe(true);
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+	expect(Date.parse(args.timestamp) / 1000).toBeCloseTo(new Date().getTime() / 1000, 0);
+};
+
 describe('WebSocket events', () => {
 	let clientSocket: ClientSocket;
 	let secondClientSocket: ClientSocket;
@@ -103,15 +114,7 @@ describe('WebSocket events', () => {
 			const message = 'testmessage';
 
 			clientSocket.on('message', args => {
-				expect(args).toHaveProperty('message');
-				expect(args).toHaveProperty('sender');
-				expect(args).toHaveProperty('timestamp');
-				expect(args.message).toBe(message);
-				expect(args.sender).toBe('test user 1');
-				expect(typeof args.timestamp === 'string').toBe(true);
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-				expect(Date.parse(args.timestamp) / 1000).toBeCloseTo(new Date().getTime() / 1000, 0);
-
+				assertMessageContent(args, message, 'test user 1');
 				done();
 			});
 
@@ -124,19 +127,28 @@ describe('WebSocket events', () => {
 			secondClientSocket.connect();
 
 			secondClientSocket.on('message', args => {
-				expect(args).toHaveProperty('message');
-				expect(args).toHaveProperty('sender');
-				expect(args).toHaveProperty('timestamp');
-				expect(args.message).toBe(message);
-				expect(args.sender).toBe('test user 2');
-				expect(typeof args.timestamp === 'string').toBe(true);
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-				expect(Date.parse(args.timestamp) / 1000).toBeCloseTo(new Date().getTime() / 1000, 0);
+				assertMessageContent(args, message, 'test user 2');
 
 				done();
 			});
 
 			secondClientSocket.emit('message', {message});
+		});
+
+		it('Should get message from other clients in global chat', done => {
+			const message = 'testmessage';
+
+			secondClientSocket.on('message', args => {
+				assertMessageContent(args, message, 'test user 1');
+
+				done();
+			});
+
+			secondClientSocket.on('connect', () => {
+				clientSocket.emit('message', {message});
+			});
+
+			secondClientSocket.connect();
 		});
 	});
 });
