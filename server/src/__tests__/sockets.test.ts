@@ -9,11 +9,13 @@ import supertest from 'supertest';
 import {sequelize, userTable} from '../database';
 
 import {expect, describe, it} from '@jest/globals';
+import {type UserPublic} from '../validators/UserPublic';
 
 type UserInfo = {
 	username: string;
 	password: string;
 	token?: string;
+	id?: string;
 };
 
 const createUser = async (api: supertest.SuperTest<supertest.Test>, userInfo: UserInfo) => {
@@ -24,10 +26,12 @@ const createUser = async (api: supertest.SuperTest<supertest.Test>, userInfo: Us
 		password,
 	};
 
-	await api
+	const result = await api
 		.post('/api/users')
 		.send(user)
 		.expect(201);
+
+	userInfo.id = (result.body.id as string);
 
 	const response = await api
 		.post('/api/login')
@@ -40,7 +44,7 @@ const createUser = async (api: supertest.SuperTest<supertest.Test>, userInfo: Us
 	userInfo.token = (response.body.token as string);
 };
 
-const assertMessageContent = (args: any, expectedMessage: string, expectedUser: string) => {
+const assertMessageContent = (args: any, expectedMessage: string, expectedUser: string, expectedRecipients: UserPublic[] | undefined = undefined) => {
 	expect(args).toHaveProperty('message');
 	expect(args).toHaveProperty('sender');
 	expect(args).toHaveProperty('timestamp');
@@ -49,6 +53,8 @@ const assertMessageContent = (args: any, expectedMessage: string, expectedUser: 
 	expect(typeof args.timestamp === 'string').toBe(true);
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 	expect(Date.parse(args.timestamp) / 1000).toBeCloseTo(new Date().getTime() / 1000, 0);
+
+	expect(args.recipients).toEqual(expectedRecipients);
 };
 
 const assertServerEventContent = (args: any, expectedMessage: string) => {
@@ -197,6 +203,51 @@ describe('WebSocket events', () => {
 				secondClientSocket.disconnect();
 			});
 			secondClientSocket.connect();
+		});
+	});
+
+	describe('private messages', () => {
+		it('Should send message to recipient', done => {
+			const message = 'private message test';
+			const recipients = [{username: users[0].username, id: users[0].id!}];
+
+			const expectedRecipients = [{username: users[1].username, id: users[1].id!}];
+
+			const messages: any[] = [];
+
+			clientSocket.on('message', args => {
+				assertMessageContent(args, message, 'test user 2', expectedRecipients);
+				messages.push(args);
+			});
+
+			secondClientSocket.connect();
+
+			secondClientSocket.emit('message', {message, recipients});
+
+			setTimeout(() => {
+				expect(messages).toHaveLength(1);
+				done();
+			}, 500);
+		});
+
+		it('Should NOT send message to other than recipient', done => {
+			const message = 'private message test';
+			const recipients = [{username: 'initial-user', id: 'test-id'}];
+
+			const messages: any[] = [];
+
+			clientSocket.on('message', args => {
+				messages.push(args);
+			});
+
+			secondClientSocket.connect();
+
+			secondClientSocket.emit('message', {message, recipients});
+
+			setTimeout(() => {
+				expect(messages).toHaveLength(0);
+				done();
+			}, 500);
 		});
 	});
 });
