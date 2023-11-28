@@ -51,6 +51,19 @@ const assertMessageContent = (args: any, expectedMessage: string, expectedUser: 
 	expect(Date.parse(args.timestamp) / 1000).toBeCloseTo(new Date().getTime() / 1000, 0);
 };
 
+const assertServerEventContent = (args: any, expectedMessage: string) => {
+	expect(args).toHaveProperty('message');
+	expect(args).toHaveProperty('timestamp');
+
+	expect(typeof args.message === 'string').toBe(true);
+	expect(typeof args.timestamp === 'string').toBe(true);
+
+	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+	expect(Date.parse(args.timestamp) / 1000).toBeCloseTo(new Date().getTime() / 1000, 0);
+
+	expect((args.message as string)).toBe(expectedMessage);
+};
+
 describe('WebSocket events', () => {
 	let clientSocket: ClientSocket;
 	let secondClientSocket: ClientSocket;
@@ -99,6 +112,9 @@ describe('WebSocket events', () => {
 	});
 
 	afterEach(() => {
+		clientSocket.off();
+		secondClientSocket.off();
+
 		clientSocket.disconnect();
 		secondClientSocket.disconnect();
 		io.close();
@@ -121,7 +137,7 @@ describe('WebSocket events', () => {
 			clientSocket.emit('message', {message});
 		});
 
-		it('Should return message sent with sender username and timestamp string to other users', done => {
+		it('Should return message sent with sender username and timestamp string (second client)', done => {
 			const message = 'testmessage';
 
 			secondClientSocket.connect();
@@ -148,6 +164,42 @@ describe('WebSocket events', () => {
 				clientSocket.emit('message', {message});
 			});
 
+			secondClientSocket.connect();
+		});
+	});
+
+	describe('server-event', () => {
+		it('Should send welcome-message on connect', done => {
+			secondClientSocket.on('server-event', args => {
+				assertServerEventContent(args, 'Welcome to the messenger app. Users currently online: initial-user, test user 1, test user 2');
+				done();
+			});
+
+			secondClientSocket.connect();
+		});
+
+		it('Should send joined message when another user connects', done => {
+			clientSocket.on('server-event', args => {
+				assertServerEventContent(args, 'test user 2 joined the chat');
+				done();
+			});
+
+			secondClientSocket.connect();
+		});
+
+		it('Should send left message when another user disconnects', done => {
+			clientSocket.on('server-event', args => {
+				if (args.message === 'test user 2 joined the chat') {
+					return;
+				}
+
+				assertServerEventContent(args, 'test user 2 left the chat');
+				done();
+			});
+
+			secondClientSocket.on('connect', () => {
+				secondClientSocket.disconnect();
+			});
 			secondClientSocket.connect();
 		});
 	});
