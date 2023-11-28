@@ -1,3 +1,4 @@
+
 import {type Socket as ClientSocket, io as clientIo} from 'socket.io-client';
 import {type Server as HttpServer, createServer} from 'node:http';
 import {type Server} from 'socket.io';
@@ -11,6 +12,7 @@ import {expect} from '@jest/globals';
 
 describe('WebSocket events', () => {
 	let clientSocket: ClientSocket;
+	let secondClientSocket: ClientSocket;
 	let httpServer: HttpServer;
 
 	let io: Server;
@@ -53,13 +55,17 @@ describe('WebSocket events', () => {
 		httpServer = createServer(httpServer);
 		io = attachSocketServerTo(httpServer);
 
-		// Promise is needed to wait for socket connection to be set
+		// Promise is needed to wait for socket connections to be ready
 		await new Promise<void>(resolve => {
 			httpServer.listen(() => {
 				const {port} = httpServer.address() as AddressInfo;
-				clientSocket = clientIo(`http://localhost:${port}`, {auth: {token}});
+				const serverUrl = `http://localhost:${port}`;
+
+				clientSocket = clientIo(serverUrl, {auth: {token}});
+
 				clientSocket.on('connect', () => {
-					// Signal that the async setup is done
+					secondClientSocket = clientIo(serverUrl, {auth: {token}, forceNew: true, autoConnect: false});
+
 					resolve();
 				});
 			});
@@ -68,6 +74,7 @@ describe('WebSocket events', () => {
 
 	afterEach(() => {
 		clientSocket.disconnect();
+		secondClientSocket.disconnect();
 		io.close();
 		httpServer.close();
 	});
@@ -99,7 +106,9 @@ describe('WebSocket events', () => {
 		it('Should return message sent with sender username and timestamp string', done => {
 			const message = 'testmessage';
 
-			clientSocket.on('message', args => {
+			secondClientSocket.connect();
+
+			secondClientSocket.on('message', args => {
 				expect(args).toHaveProperty('message');
 				expect(args).toHaveProperty('sender');
 				expect(args).toHaveProperty('timestamp');
@@ -112,7 +121,7 @@ describe('WebSocket events', () => {
 				done();
 			});
 
-			clientSocket.emit('message', {message});
+			secondClientSocket.emit('message', {message});
 		});
 	});
 });

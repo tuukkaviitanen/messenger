@@ -57,6 +57,11 @@ const Chat = () => {
 		timestamp: string;
 	};
 
+	type ServerEventContent = {
+		message: string;
+		timestamp: string;
+	};
+
 	useEffect(() => {
 		socket?.on(
 			SocketEvent.Message,
@@ -65,6 +70,11 @@ const Chat = () => {
 			},
 		);
 
+		socket?.on(SocketEvent.ServerEvent, ({message, timestamp}: ServerEventContent) => {
+			console.log(message, timestamp);
+			dispatch(addMessage({message: {message, sender: 'server', timestamp: new Date(timestamp)}}));
+		});
+
 		socket?.on(SocketEvent.ConnectionError, error => {
 			dispatch(addMessage({message: {message: error.message, sender: 'connection', timestamp: new Date()}}));
 		});
@@ -72,6 +82,7 @@ const Chat = () => {
 		return () => {
 			socket?.off(SocketEvent.Message);
 			socket?.off(SocketEvent.ConnectionError);
+			socket?.off(SocketEvent.ServerEvent);
 		};
 	}, [socket, messages, dispatch]);
 
