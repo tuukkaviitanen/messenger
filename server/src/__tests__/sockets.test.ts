@@ -22,6 +22,9 @@ describe('WebSocket events', () => {
 	beforeAll(async () => {
 		await sequelize.authenticate();
 		await userTable.sync();
+	});
+
+	beforeEach(async () => {
 		await userTable.destroy({
 			truncate: true,
 		});
@@ -42,34 +45,57 @@ describe('WebSocket events', () => {
 			.expect(200);
 
 		expect(response.body).toHaveProperty('token');
-
 		expect(typeof response.body.token === 'string').toBe(true);
 
 		token = (response.body.token as string);
-	});
 
-	beforeAll(done => {
+		// Start the server and establish socket connection
 		httpServer = createServer(httpServer);
 		io = attachSocketServerTo(httpServer);
-		httpServer.listen(() => {
-			const {port} = (httpServer.address() as AddressInfo);
-			clientSocket = clientIo(`http://localhost:${port}`, {auth: {token}});
-			clientSocket.on('connect', done);
+
+		// Promise is needed to wait for socket connection to be set
+		await new Promise<void>(resolve => {
+			httpServer.listen(() => {
+				const {port} = httpServer.address() as AddressInfo;
+				clientSocket = clientIo(`http://localhost:${port}`, {auth: {token}});
+				clientSocket.on('connect', () => {
+					// Signal that the async setup is done
+					resolve();
+				});
+			});
 		});
 	});
 
 	afterEach(() => {
-		clientSocket.off();
-	});
-
-	afterAll(async () => {
 		clientSocket.disconnect();
 		io.close();
 		httpServer.close();
+	});
+
+	afterAll(async () => {
 		await sequelize.close();
 	});
 
 	describe('message', () => {
+		it('Should return message sent with sender username and timestamp string', done => {
+			const message = 'testmessage';
+
+			clientSocket.on('message', args => {
+				expect(args).toHaveProperty('message');
+				expect(args).toHaveProperty('sender');
+				expect(args).toHaveProperty('timestamp');
+				expect(args.message).toBe(message);
+				expect(args.sender).toBe('hellouser');
+				expect(typeof args.timestamp === 'string').toBe(true);
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+				expect(Date.parse(args.timestamp) / 1000).toBeCloseTo(new Date().getTime() / 1000, 0);
+
+				done();
+			});
+
+			clientSocket.emit('message', {message});
+		});
+
 		it('Should return message sent with sender username and timestamp string', done => {
 			const message = 'testmessage';
 
