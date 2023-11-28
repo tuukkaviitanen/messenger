@@ -112,9 +112,6 @@ describe('websocket events', () => {
 	});
 
 	afterEach(() => {
-		primaryClientSocket.off();
-		secondaryClientSocket.off();
-
 		primaryClientSocket.disconnect();
 		secondaryClientSocket.disconnect();
 		io.close();
