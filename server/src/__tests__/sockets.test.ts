@@ -10,6 +10,36 @@ import {sequelize, userTable} from '../database';
 
 import {expect} from '@jest/globals';
 
+type UserInfo = {
+	username: string;
+	password: string;
+	token?: string;
+};
+
+const createUser = async (api: supertest.SuperTest<supertest.Test>, userInfo: UserInfo) => {
+	const {username, password} = userInfo;
+
+	const user = {
+		username,
+		password,
+	};
+
+	await api
+		.post('/api/users')
+		.send(user)
+		.expect(201);
+
+	const response = await api
+		.post('/api/login')
+		.send(user)
+		.expect(200);
+
+	expect(response.body).toHaveProperty('token');
+	expect(typeof response.body.token === 'string').toBe(true);
+
+	userInfo.token = (response.body.token as string);
+};
+
 describe('WebSocket events', () => {
 	let clientSocket: ClientSocket;
 	let secondClientSocket: ClientSocket;
@@ -17,40 +47,25 @@ describe('WebSocket events', () => {
 
 	let io: Server;
 
-	const api = supertest(app);
-
-	let token: string;
+	const users: UserInfo[] = [
+		{username: 'test user 1', password: 'test password 1'},
+		{username: 'test user 2', password: 'test password 2'},
+	];
 
 	beforeAll(async () => {
 		await sequelize.authenticate();
 		await userTable.sync();
-	});
-
-	beforeEach(async () => {
 		await userTable.destroy({
 			truncate: true,
 		});
 
-		const user = {
-			username: 'hellouser',
-			password: 'password',
-		};
+		const api = supertest(app);
 
-		await api
-			.post('/api/users')
-			.send(user)
-			.expect(201);
+		await createUser(api, users[0]);
+		await createUser(api, users[1]);
+	});
 
-		const response = await api
-			.post('/api/login')
-			.send(user)
-			.expect(200);
-
-		expect(response.body).toHaveProperty('token');
-		expect(typeof response.body.token === 'string').toBe(true);
-
-		token = (response.body.token as string);
-
+	beforeEach(async () => {
 		// Start the server and establish socket connection
 		httpServer = createServer(httpServer);
 		io = attachSocketServerTo(httpServer);
@@ -61,10 +76,10 @@ describe('WebSocket events', () => {
 				const {port} = httpServer.address() as AddressInfo;
 				const serverUrl = `http://localhost:${port}`;
 
-				clientSocket = clientIo(serverUrl, {auth: {token}});
+				clientSocket = clientIo(serverUrl, {auth: {token: users[0].token}});
 
 				clientSocket.on('connect', () => {
-					secondClientSocket = clientIo(serverUrl, {auth: {token}, forceNew: true, autoConnect: false});
+					secondClientSocket = clientIo(serverUrl, {auth: {token: users[1].token}, forceNew: true, autoConnect: false});
 
 					resolve();
 				});
@@ -92,7 +107,7 @@ describe('WebSocket events', () => {
 				expect(args).toHaveProperty('sender');
 				expect(args).toHaveProperty('timestamp');
 				expect(args.message).toBe(message);
-				expect(args.sender).toBe('hellouser');
+				expect(args.sender).toBe('test user 1');
 				expect(typeof args.timestamp === 'string').toBe(true);
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				expect(Date.parse(args.timestamp) / 1000).toBeCloseTo(new Date().getTime() / 1000, 0);
@@ -103,7 +118,7 @@ describe('WebSocket events', () => {
 			clientSocket.emit('message', {message});
 		});
 
-		it('Should return message sent with sender username and timestamp string', done => {
+		it('Should return message sent with sender username and timestamp string to other users', done => {
 			const message = 'testmessage';
 
 			secondClientSocket.connect();
@@ -113,7 +128,7 @@ describe('WebSocket events', () => {
 				expect(args).toHaveProperty('sender');
 				expect(args).toHaveProperty('timestamp');
 				expect(args.message).toBe(message);
-				expect(args.sender).toBe('hellouser');
+				expect(args.sender).toBe('test user 2');
 				expect(typeof args.timestamp === 'string').toBe(true);
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 				expect(Date.parse(args.timestamp) / 1000).toBeCloseTo(new Date().getTime() / 1000, 0);
