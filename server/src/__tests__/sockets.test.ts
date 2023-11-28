@@ -8,7 +8,7 @@ import app from '../app';
 import supertest from 'supertest';
 import {sequelize, userTable} from '../database';
 
-import {expect} from '@jest/globals';
+import {expect, describe, it} from '@jest/globals';
 
 type UserInfo = {
 	username: string;
@@ -89,24 +89,20 @@ describe('WebSocket events', () => {
 		await createUser(api, users[1]);
 	});
 
-	beforeEach(async () => {
-		// Start the server and establish socket connection
+	beforeEach(done => {
 		httpServer = createServer(httpServer);
 		io = attachSocketServerTo(httpServer);
 
-		// Promise is needed to wait for socket connections to be ready
-		await new Promise<void>(resolve => {
-			httpServer.listen(() => {
-				const {port} = httpServer.address() as AddressInfo;
-				const serverUrl = `http://localhost:${port}`;
+		httpServer.listen(() => {
+			const {port} = httpServer.address() as AddressInfo;
+			const serverUrl = `http://localhost:${port}`;
 
-				clientSocket = clientIo(serverUrl, {auth: {token: users[0].token}});
+			clientSocket = clientIo(serverUrl, {auth: {token: users[0].token}});
 
-				clientSocket.on('connect', () => {
-					secondClientSocket = clientIo(serverUrl, {auth: {token: users[1].token}, forceNew: true, autoConnect: false});
+			clientSocket.on('connect', () => {
+				secondClientSocket = clientIo(serverUrl, {auth: {token: users[1].token}, forceNew: true, autoConnect: false});
 
-					resolve();
-				});
+				done();
 			});
 		});
 	});
