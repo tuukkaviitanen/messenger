@@ -19,6 +19,7 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 		Disconnect = 'disconnect',
 		Message = 'message',
 		Users = 'users',
+		ServerEvent = 'server-event',
 	}
 
 	type MessageContent = {
@@ -56,19 +57,17 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 
 		logger.log(`socket ${socket.id} connected as user ${user.username}`);
 		socket.broadcast.emit(
-			...createMessageEvent({
-				sender: user.username,
-				message: 'joined the chat',
-			}),
+			SocketEvent.ServerEvent,
+			{message: `${user.username} joined the chat`, timestamp: new Date()},
 		);
 		socket.emit(
-			...createMessageEvent({
-				sender: 'server',
+			SocketEvent.ServerEvent,
+			{
 				message: `Welcome to the messenger app. Users currently online: ${connectedUsers
 					.map(u => u.username)
 					.join(', ')}`,
-			}),
-		);
+				timestamp: new Date(),
+			});
 
 		socket.on(SocketEvent.Message, ({message, recipients}: {message: string; recipients?: UserPublic[]}) => {
 			if (recipients) {
@@ -95,10 +94,8 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 		socket.on(SocketEvent.Disconnect, () => {
 			logger.log(`${user.username} disconnected`);
 			socket.broadcast.emit(
-				...createMessageEvent({
-					sender: user.username,
-					message: 'left the chat',
-				}),
+				SocketEvent.ServerEvent,
+				{message: `${user.username} left the chat`, timestamp: new Date()},
 			);
 			removeUser(user);
 		});

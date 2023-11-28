@@ -9,24 +9,24 @@ Running as a free tier service so it might take some time to start up.
 
 ## Summary
 
-Node server has a REST API using [Express](https://expressjs.com/) and WebSockets server using Socket.io.
+Node server has a [REST API](https://www.ibm.com/topics/rest-apis) using [Express](https://expressjs.com/) and WebSockets server using [Socket.io](https://socket.io/).
 
-Users are validated and stored in a PostgreSQL database.
+Users are validated and stored in a [PostgreSQL](https://www.postgresql.org/) database.
 
-REST API is used for user management and websockets are used to transport messages between users real-time.
+REST API is used for user management and WebSockets are used to transport messages between users real-time.
 
-Project is built with TypeScript.
-[Zod](https://zod.dev/)-library is used to validate all inbound data at runtime as TypeScript types exist only until it is compiled into JavaScript. ESLint is used to enforce coding-style and format. Both frontend and backend ESLint setups are based on [XO](https://github.com/xojs/xo) rule set.
+Project is built with [TypeScript](https://www.typescriptlang.org/).
+[Zod](https://zod.dev/)-library is used to validate all inbound data at runtime as TypeScript types exist only until it is compiled into JavaScript. [ESLint](https://eslint.org/) is used to enforce coding-style and format. Both frontend and backend ESLint setups are based on [XO](https://github.com/xojs/xo) rule set.
 
 ## CI/CD
 
-There is a Github Actions build workflow in place to lint, test & build the code. Everything is tested in pull requests so broken code doesn't get into main branch.
+There is a [Github Actions workflow](https://docs.github.com/en/actions/using-workflows/about-workflows) in place to lint, build, test, tag & deploy the application. Everything is tested in pull requests so broken code doesn't get into main branch.
 
-The the CI pipeline consist of 3 jobs:
+The the CI/CD pipeline consist of 3 jobs:
 
 ### build
 
-Checkouts the code, installs dependecies, runs eslint, builds projects, runs tests (integration tests and end-to-end tests).
+Checkouts the code, installs dependencies, runs eslint, builds projects, runs tests (integration tests and end-to-end tests).
 
 Backend integration testing requires a test database, so the build pipeline runs a PostgreSQL Docker container as a service that is used in the pipeline tests. This guarantees that there aren't any external dependencies that would fail the tests (in this case, losing connection to remote test database)
 
@@ -34,12 +34,12 @@ Build job is actually done 3 times concurrently. Each with a different node vers
 
 ### tag_release
 
-If build is successful, runs [github-tag-action](https://github.com/anothrNick/github-tag-action) that bumps the tag version of the repository. By default it bumps up the patch version but minor version and major version can also be bumped by adding #major or #minor to commit message.
+If build is successful, runs [github-tag-action](https://github.com/anothrNick/github-tag-action) that bumps the tag version of the repository. By default it bumps up the patch version, but minor version and major version can also be bumped by adding #major or #minor to a commit message.
 
 ### deployment
 
 If build and tagging are successful, deploys the main branch to [Render](https://render.com/) using [render-deploy-action](https://github.com/johnbeynon/render-deploy-action).
-After initializing the deployment, waits for deployment to finish successfully using [render-action](https://github.com/Bounceapp/render-action).
+After initializing the deployment, waits for deployment to finish successfully using [render-action](https://github.com/Bounceapp/render-action). It's good to note that these are separate steps to make locating possible problems easier. Free tier render services might take a long time to build and start up if there's a lot of traffic.
 
 ## Tests
 
@@ -51,7 +51,7 @@ There are integration tests for REST API Endpoints and WebSocket events.
 
 These tests use the [Jest](https://jestjs.io/)-library for tests.
 REST API endpoints are tested with [Supertest](https://github.com/ladjs/supertest#readme).
-Socket.io events are tested with Socket.io client in the backend.
+[Socket.io](https://socket.io/) events are tested with multiple client sockets in the backend. These tests make sure that messages are received in correct form and are sent to the correct users.
 
 ### End-to-End tests
 
@@ -65,7 +65,7 @@ E2E tests are important for the CI/CD pipeline. Finishing these tests successful
 
 ### User management
 
-Backend runs an express server with `/api/users` and `/api/login` endpoints. Users can be created and single users can be fetched with id. Login returns a JsonWebToken that can be used for authentication in following requests.
+Backend runs an express server with `/api/users` and `/api/login` endpoints. Users can be created and single users can be fetched with id. Login returns a [JsonWebToken](https://jwt.io/) that can be used for authentication in following requests.
 
 Users are stored in a [PostgreSQL](https://www.postgresql.org/) server through [Sequelize](https://sequelize.org/). Passwords are hashed and usernames are unique.
 
@@ -73,21 +73,21 @@ Users are stored in a [PostgreSQL](https://www.postgresql.org/) server through [
 
 Frontend is built with [React](https://react.dev/) and styled with [Material UI](https://mui.com/material-ui/).
 
-[Redux](https://redux.js.org/) is used for state management. Client's state isn't too complicated so React's Context API could have been used instead, but I was interested in learning more about Redux and at least it leaves room for scaling.
+[Redux](https://redux.js.org/) is used for state management. Client's state isn't too complicated so [React's Context API](https://react.dev/learn/passing-data-deeply-with-context) could have been used instead, but I was interested in learning more about Redux and at least it leaves room for scaling.
 
-Full-Duplex connection to server is created using Socket.io. It primarily uses WebSockets to send messages both ways. All websocket connections are authenticated with the JsonWebToken that is returned from the server on successful login. JWT is currently stored in localstorage.
+[Full-Duplex](https://techterms.com/definition/full-duplex) connection to server is created using [Socket.io](https://socket.io/). It primarily uses WebSockets to send messages both ways. All socket connections are authenticated with the JsonWebToken that is returned from the server on successful login. JWT is currently stored in [LocalStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
 
-[CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) is not needed even when running the client in development mode as Vite is configured to proxy these connections to server port and to change the origin. This works for both HTTP- and WebSocket connections.
+[CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) is not needed even when running the client in development mode as Vite is configured to proxy these connections to server port and to change the origin. This works for both HTTP and WebSocket connections.
 
 # Planned
 
-- Group chats to chat client
-- Testing with multiple clients
+- Group chats to frontend
+   - Functionality already exists on the server
 - Saving chats to database
   - Maybe encryption of some kind
 - Full CRUD-actions to users in API
 - Containerizing the whole application using [Docker](https://www.docker.com/)
-- Component tests to frontend
+- Component tests to frontend?
 
 ## Setup
 
@@ -113,7 +113,7 @@ The production version is running version 20.9.0.
    b. Run `npm run build` and `npm start` to build and run for production.
    c. Run `npm test` for running tests
    d. Run `npm start:test` to start server with `test` mode (required for E2E tests)
-   e. Run `npm test:e2e` to run End-to-End test while server is running in `test` mode
+   e. Run `npm test:e2e` to run End-to-End test while server is running in `test` mode. Run this in a separate terminal.
 
 ### Frontend
 

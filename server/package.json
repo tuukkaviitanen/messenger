@@ -11,6 +11,8 @@
     "lint:fix": "npm run lint -- --fix",
     "start": "cross-env NODE_ENV=production node build/index.js",
     "test": "cross-env NODE_ENV=test jest --runInBand",
+    "test:debug": "npm test -- --detectOpenHandles",
+    "test:force": "npm test -- --forceExit",
     "start:test": "cross-env NODE_ENV=test node build/index.js",
     "test:e2e": "cypress run",
     "cypress:open": "cypress open"
