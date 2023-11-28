@@ -169,7 +169,7 @@ describe('websocket events', () => {
 		it('should receive welcome message on connect', done => {
 			secondaryClientSocket.on('server-event', args => {
 				assertServerEventContent(args, 'Welcome to the messenger app. Users currently online: initial-user, test user 1, test user 2');
-				done();
+				setTimeout(done, 100); // Timeout prevents handles from being left open; according to Jest
 			});
 
 			secondaryClientSocket.connect();
@@ -178,7 +178,7 @@ describe('websocket events', () => {
 		it('should receive joined message when another user connects', done => {
 			primaryClientSocket.on('server-event', args => {
 				assertServerEventContent(args, 'test user 2 joined the chat');
-				done();
+				setTimeout(done, 100); // Timeout prevents handles from being left open; according to Jest
 			});
 
 			secondaryClientSocket.connect();
