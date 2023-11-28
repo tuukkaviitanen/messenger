@@ -71,8 +71,8 @@ const assertServerEventContent = (args: any, expectedMessage: string) => {
 };
 
 describe('websocket events', () => {
-	let clientSocket: ClientSocket;
-	let secondClientSocket: ClientSocket;
+	let primaryClientSocket: ClientSocket;
+	let secondaryClientSocket: ClientSocket;
 	let httpServer: HttpServer;
 
 	let io: Server;
@@ -103,10 +103,10 @@ describe('websocket events', () => {
 			const {port} = httpServer.address() as AddressInfo;
 			const serverUrl = `http://localhost:${port}`;
 
-			clientSocket = clientIo(serverUrl, {auth: {token: users[0].token}});
+			primaryClientSocket = clientIo(serverUrl, {auth: {token: users[0].token}});
 
-			clientSocket.on('connect', () => {
-				secondClientSocket = clientIo(serverUrl, {auth: {token: users[1].token}, forceNew: true, autoConnect: false});
+			primaryClientSocket.on('connect', () => {
+				secondaryClientSocket = clientIo(serverUrl, {auth: {token: users[1].token}, forceNew: true, autoConnect: false});
 
 				done();
 			});
@@ -114,11 +114,11 @@ describe('websocket events', () => {
 	});
 
 	afterEach(() => {
-		clientSocket.off();
-		secondClientSocket.off();
+		primaryClientSocket.off();
+		secondaryClientSocket.off();
 
-		clientSocket.disconnect();
-		secondClientSocket.disconnect();
+		primaryClientSocket.disconnect();
+		secondaryClientSocket.disconnect();
 		io.close();
 		httpServer.close();
 	});
@@ -131,66 +131,66 @@ describe('websocket events', () => {
 		it('should receive correct message when sent to global chat', done => {
 			const message = 'testmessage';
 
-			clientSocket.on('message', args => {
+			primaryClientSocket.on('message', args => {
 				assertMessageContent(args, message, 'test user 1');
 				done();
 			});
 
-			clientSocket.emit('message', {message});
+			primaryClientSocket.emit('message', {message});
 		});
 
 		it('should receive correct message when sent to global chat (second client)', done => {
 			const message = 'testmessage';
 
-			secondClientSocket.connect();
+			secondaryClientSocket.connect();
 
-			secondClientSocket.on('message', args => {
+			secondaryClientSocket.on('message', args => {
 				assertMessageContent(args, message, 'test user 2');
 
 				done();
 			});
 
-			secondClientSocket.emit('message', {message});
+			secondaryClientSocket.emit('message', {message});
 		});
 
 		it('should receive message from other clients in global chat', done => {
 			const message = 'testmessage';
 
-			secondClientSocket.on('message', args => {
+			secondaryClientSocket.on('message', args => {
 				assertMessageContent(args, message, 'test user 1');
 
 				done();
 			});
 
-			secondClientSocket.on('connect', () => {
-				clientSocket.emit('message', {message});
+			secondaryClientSocket.on('connect', () => {
+				primaryClientSocket.emit('message', {message});
 			});
 
-			secondClientSocket.connect();
+			secondaryClientSocket.connect();
 		});
 	});
 
 	describe('server-event', () => {
 		it('should receive welcome message on connect', done => {
-			secondClientSocket.on('server-event', args => {
+			secondaryClientSocket.on('server-event', args => {
 				assertServerEventContent(args, 'Welcome to the messenger app. Users currently online: initial-user, test user 1, test user 2');
 				done();
 			});
 
-			secondClientSocket.connect();
+			secondaryClientSocket.connect();
 		});
 
 		it('should receive joined message when another user connects', done => {
-			clientSocket.on('server-event', args => {
+			primaryClientSocket.on('server-event', args => {
 				assertServerEventContent(args, 'test user 2 joined the chat');
 				done();
 			});
 
-			secondClientSocket.connect();
+			secondaryClientSocket.connect();
 		});
 
 		it('should receive left message when another user disconnects', done => {
-			clientSocket.on('server-event', args => {
+			primaryClientSocket.on('server-event', args => {
 				if (args.message === 'test user 2 joined the chat') {
 					return;
 				}
@@ -199,10 +199,10 @@ describe('websocket events', () => {
 				done();
 			});
 
-			secondClientSocket.on('connect', () => {
-				secondClientSocket.disconnect();
+			secondaryClientSocket.on('connect', () => {
+				secondaryClientSocket.disconnect();
 			});
-			secondClientSocket.connect();
+			secondaryClientSocket.connect();
 		});
 	});
 
@@ -215,14 +215,14 @@ describe('websocket events', () => {
 
 			const messages: any[] = [];
 
-			clientSocket.on('message', args => {
+			primaryClientSocket.on('message', args => {
 				assertMessageContent(args, message, 'test user 2', expectedRecipients);
 				messages.push(args);
 			});
 
-			secondClientSocket.connect();
+			secondaryClientSocket.connect();
 
-			secondClientSocket.emit('message', {message, recipients});
+			secondaryClientSocket.emit('message', {message, recipients});
 
 			setTimeout(() => {
 				expect(messages).toHaveLength(1);
@@ -236,13 +236,13 @@ describe('websocket events', () => {
 
 			const messages: any[] = [];
 
-			clientSocket.on('message', args => {
+			primaryClientSocket.on('message', args => {
 				messages.push(args);
 			});
 
-			secondClientSocket.connect();
+			secondaryClientSocket.connect();
 
-			secondClientSocket.emit('message', {message, recipients});
+			secondaryClientSocket.emit('message', {message, recipients});
 
 			setTimeout(() => {
 				expect(messages).toHaveLength(0);
