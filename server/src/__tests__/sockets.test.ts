@@ -77,10 +77,8 @@ describe('websocket events', () => {
 
 	let io: Server;
 
-	const users: UserInfo[] = [
-		{username: 'test user 1', password: 'test password 1'},
-		{username: 'test user 2', password: 'test password 2'},
-	];
+	const primaryUser: UserInfo = {username: 'test user 1', password: 'test password 1'};
+	const secondaryUser: UserInfo = {username: 'test user 2', password: 'test password 2'};
 
 	beforeAll(async () => {
 		await sequelize.authenticate();
@@ -91,8 +89,8 @@ describe('websocket events', () => {
 
 		const api = supertest(app);
 
-		await createUser(api, users[0]);
-		await createUser(api, users[1]);
+		await createUser(api, primaryUser);
+		await createUser(api, secondaryUser);
 	});
 
 	beforeEach(done => {
@@ -103,10 +101,10 @@ describe('websocket events', () => {
 			const {port} = httpServer.address() as AddressInfo;
 			const serverUrl = `http://localhost:${port}`;
 
-			primaryClientSocket = clientIo(serverUrl, {auth: {token: users[0].token}});
+			primaryClientSocket = clientIo(serverUrl, {auth: {token: primaryUser.token}});
 
 			primaryClientSocket.on('connect', () => {
-				secondaryClientSocket = clientIo(serverUrl, {auth: {token: users[1].token}, forceNew: true, autoConnect: false});
+				secondaryClientSocket = clientIo(serverUrl, {auth: {token: secondaryUser.token}, forceNew: true, autoConnect: false});
 
 				done();
 			});
@@ -209,9 +207,9 @@ describe('websocket events', () => {
 	describe('private messages', () => {
 		it('should send message to recipient', done => {
 			const message = 'private message test';
-			const recipients = [{username: users[0].username, id: users[0].id!}];
+			const recipients = [{username: primaryUser.username, id: primaryUser.id!}];
 
-			const expectedRecipients = [{username: users[1].username, id: users[1].id!}];
+			const expectedRecipients = [{username: secondaryUser.username, id: secondaryUser.id!}];
 
 			const messages: any[] = [];
 
