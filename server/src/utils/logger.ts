@@ -17,6 +17,14 @@ const error = (...params: any[]) => {
 	console.error(params);
 };
 
-const logger = {log, info, error};
+const warn = (...params: any[]) => {
+	console.warn(params);
+};
+
+const debug = (...params: any[]) => {
+	console.debug(params);
+};
+
+const logger = {log, info, error, warn, debug};
 
 export default logger;

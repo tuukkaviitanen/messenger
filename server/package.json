@@ -53,6 +53,7 @@
     "pg": "^8.11.3",
     "sequelize": "^6.34.0",
     "socket.io": "^4.7.2",
+    "umzug": "^3.4.0",
     "zod": "^3.22.4",
     "zod-validation-error": "^2.1.0"
   }
