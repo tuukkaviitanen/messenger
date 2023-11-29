@@ -1,7 +1,7 @@
 import supertest from 'supertest';
 
-import app from '../app';
-import {userTable, sequelize} from '../database';
+import app from '../server/express';
+import {userTable, sequelize, connectToDatabase} from '../database';
 
 import {expect} from '@jest/globals';
 
@@ -14,8 +14,7 @@ const resetUsers = async () => {
 };
 
 beforeAll(async () => {
-	await sequelize.authenticate();
-	await userTable.sync();
+	await connectToDatabase();
 });
 
 beforeEach(async () => {

@@ -1,13 +1,10 @@
-import app from './app';
-import {createServer, type Server as HttpServer} from 'node:http';
+import {type Server as HttpServer} from 'node:http';
 import {Server} from 'socket.io';
-import logger from './utils/logger';
-import {type UserPublic} from './validators/UserPublic';
-import {tokenParserMiddleware} from './utils/middleware';
-import {type SocketWithUser} from './utils/types';
-import config from './utils/config';
-
-const server = createServer(app);
+import logger from '../utils/logger';
+import {type UserPublic} from '../validators/UserPublic';
+import {tokenParserMiddleware} from '../utils/middleware';
+import {type SocketWithUser} from '../utils/types';
+import config from '../utils/config';
 
 export const attachSocketServerTo = (httpServer: HttpServer) => {
 	const io = new Server(httpServer);
@@ -103,7 +100,3 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 
 	return io;
 };
-
-attachSocketServerTo(server);
-
-export default server;

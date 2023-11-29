@@ -2,11 +2,11 @@
 import {type Socket as ClientSocket, io as clientIo} from 'socket.io-client';
 import {type Server as HttpServer, createServer} from 'node:http';
 import {type Server} from 'socket.io';
-import {attachSocketServerTo} from '../server';
+import {attachSocketServerTo} from '../server/sockets';
 import {type AddressInfo} from 'node:net';
-import app from '../app';
+import app from '../server/express';
 import supertest from 'supertest';
-import {sequelize, userTable} from '../database';
+import {connectToDatabase, sequelize, userTable} from '../database';
 
 import {expect, describe, it} from '@jest/globals';
 import {type UserPublic} from '../validators/UserPublic';
@@ -81,8 +81,7 @@ describe('websocket events', () => {
 	const secondaryUser: UserInfo = {username: 'test user 2', password: 'test password 2'};
 
 	beforeAll(async () => {
-		await sequelize.authenticate();
-		await userTable.sync();
+		await connectToDatabase();
 		await userTable.destroy({
 			truncate: true,
 		});
