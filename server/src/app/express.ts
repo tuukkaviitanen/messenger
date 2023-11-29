@@ -1,12 +1,12 @@
 import express from 'express';
 import 'express-async-errors';
-import usersRouter from './controllers/users';
-import {errorHandler, parseToken} from './utils/middleware';
-import loginRouter from './controllers/login';
+import usersRouter from '../controllers/users';
+import {errorHandler, parseToken} from '../utils/middleware';
+import loginRouter from '../controllers/login';
 import path from 'path';
-import config from './utils/config';
-import testingRouter from './controllers/testing';
-import logger from './utils/logger';
+import config from '../utils/config';
+import testingRouter from '../controllers/testing';
+import logger from '../utils/logger';
 
 const app = express();
 app.use(express.json());
@@ -23,7 +23,7 @@ app.get('/api/healthz', (req, res) => res.send('ok'));
 
 if (config.nodeEnv === 'test') {
 	app.use('/api/testing', testingRouter);
-	logger.log('TESTING ROUTER IS ENABLED! THIS SHOULD ONLY BE THE CASE WHEN RUNNING ON A TEST DATABASE!');
+	logger.info('TESTING ROUTER IS ENABLED! THIS SHOULD ONLY BE THE CASE WHEN RUNNING ON A TEST DATABASE!');
 }
 
 app.use(errorHandler);

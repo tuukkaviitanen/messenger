@@ -1,6 +1,6 @@
 import supertest from 'supertest';
 
-import app from '../app';
+import app from '../app/express';
 import {userTable, sequelize} from '../database';
 
 import {expect} from '@jest/globals';

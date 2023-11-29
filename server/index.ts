@@ -1,7 +1,7 @@
 import {connectToDatabase} from './src/database';
 import config from './src/utils/config';
 import logger from './src/utils/logger';
-import server from './src/server';
+import server from './src/app';
 
 const start = async () => {
 	await connectToDatabase();
