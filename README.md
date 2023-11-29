@@ -69,6 +69,8 @@ Backend runs an express server with `/api/users` and `/api/login` endpoints. Use
 
 Users are stored in a [PostgreSQL](https://www.postgresql.org/) server through [Sequelize](https://sequelize.org/). Passwords are hashed and usernames are unique.
 
+Database schema is updated with migrations. Migrations are done using [Umzug](https://github.com/sequelize/umzug). Any new migrations run at server startup. Tests also run migrations, so broken migrations won't get through the CI/CD pipeline.
+
 ## Frontend
 
 Frontend is built with [React](https://react.dev/) and styled with [Material UI](https://mui.com/material-ui/).
