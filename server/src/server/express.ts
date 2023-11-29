@@ -23,7 +23,7 @@ app.get('/api/healthz', (req, res) => res.send('ok'));
 
 if (config.nodeEnv === 'test') {
 	app.use('/api/testing', testingRouter);
-	logger.info('TESTING ROUTER IS ENABLED! THIS SHOULD ONLY BE THE CASE WHEN RUNNING ON A TEST DATABASE!');
+	logger.log('TESTING ROUTER IS ENABLED! THIS SHOULD ONLY BE THE CASE WHEN RUNNING ON A TEST DATABASE!');
 }
 
 app.use(errorHandler);
