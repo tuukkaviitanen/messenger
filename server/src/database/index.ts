@@ -3,6 +3,7 @@ import initUserTable from './models/User';
 import config from '../utils/config';
 import logger from '../utils/logger';
 import {Umzug, SequelizeStorage} from 'umzug';
+import 'ts-node/register';
 
 export const sequelize = new Sequelize(config.postgresUrl, {logging: logger.log});
 
