@@ -1,4 +1,4 @@
-import {Box, Button, Paper, Typography} from '@mui/material';
+import {Paper} from '@mui/material';
 import {removeCurrentUser} from '../../../reducers/userSlicer';
 import {useAppDispatch, useAppSelector} from '../../../hooks/typedReduxHooks';
 import {type User, type StyleSheet, SocketEvent} from '../../../utils/types';
@@ -7,6 +7,7 @@ import {addChat, setSelectedChatIndex} from '../../../reducers/chatSlice';
 import {usersArrayEqual} from '../../../utils/helpers';
 import Users from './Users';
 import Chats from './Chats';
+import LoginInfo from './LoginInfo';
 
 const styles: StyleSheet = {
 	container: {
@@ -15,13 +16,6 @@ const styles: StyleSheet = {
 		p: 1,
 		m: 1,
 		flex: 1,
-	},
-	text: {
-		textAlign: 'center',
-	},
-	loginContainer: {
-		display: 'flex',
-		flexDirection: 'column',
 	},
 };
 
@@ -48,7 +42,7 @@ const NavBar = () => {
 		if (chatIndex === -1) { // If chat is NOT already created
 			dispatch(addChat({chat: {messages: [], recipients: [user]}}));
 			handleChatChange(chats.length);
-		} else { // Chat is already create
+		} else { // Chat is already created
 			handleChatChange(chatIndex);
 		}
 	};
@@ -65,12 +59,8 @@ const NavBar = () => {
 
 	return (
 		<Paper elevation={10} sx={styles.container}>
-			<Box sx={styles.loginContainer}>
-				<Typography sx={styles.text} >Logged in as {currentUser?.username}</Typography>
-				<Button variant='outlined' onClick={handleLogout}>
-        Logout
-				</Button>
-			</Box>
+
+			<LoginInfo handleLogout={handleLogout} currentUser={currentUser}/>
 
 			<Chats chats={chats} handleChatChange={handleChatChange} selectedChatIndex={selectedChatIndex}/>
 
