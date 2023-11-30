@@ -1,10 +1,11 @@
 import {Box, Button, Paper, Typography, ListItemButton} from '@mui/material';
-import {removeCurrentUser} from '../../reducers/userSlicer';
-import {useAppDispatch, useAppSelector} from '../../hooks/typedReduxHooks';
-import {type User, type StyleSheet, SocketEvent} from '../../utils/types';
+import {removeCurrentUser} from '../../../reducers/userSlicer';
+import {useAppDispatch, useAppSelector} from '../../../hooks/typedReduxHooks';
+import {type User, type StyleSheet, SocketEvent} from '../../../utils/types';
 import {useEffect, useState} from 'react';
-import {addChat, setSelectedChatIndex} from '../../reducers/chatSlice';
-import {usersArrayEqual} from '../../utils/helpers';
+import {addChat, setSelectedChatIndex} from '../../../reducers/chatSlice';
+import {usersArrayEqual} from '../../../utils/helpers';
+import Users from './Users';
 
 const styles: StyleSheet = {
 	container: {
@@ -106,16 +107,8 @@ const NavBar = () => {
 
 			</Box>
 
-			<Paper id='users-container' sx={styles.usersContainer}>
-				<Typography variant='h5'>Users online</Typography>
-				<Box sx={styles.usersList}>
-					{connectedUsers.map(u => <ListItemButton key={u.id} onClick={() => {
-						handleNewChat(u);
-					}} disabled={u.username === currentUser?.username}> <Typography>{u.username}</Typography></ListItemButton>)}
+			<Users connectedUsers={connectedUsers} currentUser={currentUser} handleNewChat={handleNewChat}/>
 
-				</Box>
-
-			</Paper>
 		</Paper>
 	);
 };
