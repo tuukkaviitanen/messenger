@@ -70,7 +70,6 @@ const Chat = () => {
 		);
 
 		socket?.on(SocketEvent.ServerEvent, ({message, timestamp}: ServerEventContent) => {
-			console.log(message, timestamp);
 			dispatch(addMessage({message: {message, sender: 'server', timestamp: new Date(timestamp)}}));
 		});
 
