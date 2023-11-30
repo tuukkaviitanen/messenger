@@ -12,7 +12,6 @@ const styles: StyleSheet = {
 		flexDirection: 'column',
 	},
 	usersList: {
-		textAlign: 'center',
 		overflow: 'auto',
 	},
 };
