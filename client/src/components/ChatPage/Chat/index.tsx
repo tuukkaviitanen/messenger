@@ -1,20 +1,20 @@
 import {
 	Box,
 	ListItem,
-	Typography,
 } from '@mui/material';
-import {SocketEvent, type StyleSheet, type User} from '../../utils/types';
+import {SocketEvent, type StyleSheet, type User} from '../../../utils/types';
 import {useCallback, useEffect} from 'react';
-import {useAppDispatch, useAppSelector} from '../../hooks/typedReduxHooks';
+import {useAppDispatch, useAppSelector} from '../../../hooks/typedReduxHooks';
 import ChatInput, {type OnSubmit} from './ChatInput';
-import {addMessage} from '../../reducers/chatSlice';
+import {addMessage} from '../../../reducers/chatSlice';
+import ChatMessage from './ChatMessage';
 
 const styles: StyleSheet = {
 	container: {
 		display: 'flex',
 		flexDirection: 'column',
 		justifyContent: 'space-between',
-		flexGrow: 10,
+		flex: 3,
 	},
 	inputContainer: {
 		display: 'flex',
@@ -24,9 +24,8 @@ const styles: StyleSheet = {
 		p: 1,
 	},
 	chatArea: {
-		flexGrow: 1,
+		flex: 1,
 		overflow: 'auto',
-		height: 100, // This can be anything except 1, it will grow because of flexGrow
 	},
 };
 
@@ -71,7 +70,6 @@ const Chat = () => {
 		);
 
 		socket?.on(SocketEvent.ServerEvent, ({message, timestamp}: ServerEventContent) => {
-			console.log(message, timestamp);
 			dispatch(addMessage({message: {message, sender: 'server', timestamp: new Date(timestamp)}}));
 		});
 
@@ -101,9 +99,7 @@ const Chat = () => {
 							ref={lastMessage ? setRef : null}
 							key={m.sender + m.message + m.timestamp.toISOString()}
 						>
-							<Typography>
-								{m.sender}: {m.message}
-							</Typography>
+							<ChatMessage message={m} />
 						</ListItem>
 					);
 				})}
