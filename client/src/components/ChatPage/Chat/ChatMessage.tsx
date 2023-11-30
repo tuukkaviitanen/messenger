@@ -6,9 +6,6 @@ const styles: StyleSheet = {
 		py: 1,
 		px: 2,
 	},
-	text: {
-		//display: 'inline',
-	},
 };
 
 type Params = {
@@ -20,13 +17,13 @@ const ChatMessage = ({message}: Params) => {
 
 	return (
 		<Paper sx={styles.container}>
-			<Typography variant='subtitle2' sx={styles.text}>
+			<Typography variant='subtitle2'>
 				{message.sender}
 			</Typography>
-			<Typography sx={styles.text}>
+			<Typography>
 				{message.message}
 			</Typography>
-			<Typography variant='overline'>Sent {timeString}</Typography>
+			<Typography sx={{p: 0}} variant='overline'>Sent {timeString}</Typography>
 		</Paper>
 
 	);

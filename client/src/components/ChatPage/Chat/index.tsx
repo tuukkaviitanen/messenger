@@ -7,7 +7,7 @@ import {useCallback, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../hooks/typedReduxHooks';
 import ChatInput, {type OnSubmit} from './ChatInput';
 import {addMessage} from '../../../reducers/chatSlice';
-import ChatMessage from './Message';
+import ChatMessage from './ChatMessage';
 
 const styles: StyleSheet = {
 	container: {
