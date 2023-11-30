@@ -1,13 +1,13 @@
 import {
 	Box,
 	ListItem,
-	Typography,
 } from '@mui/material';
-import {SocketEvent, type StyleSheet, type User} from '../../utils/types';
+import {SocketEvent, type StyleSheet, type User} from '../../../utils/types';
 import {useCallback, useEffect} from 'react';
-import {useAppDispatch, useAppSelector} from '../../hooks/typedReduxHooks';
+import {useAppDispatch, useAppSelector} from '../../../hooks/typedReduxHooks';
 import ChatInput, {type OnSubmit} from './ChatInput';
-import {addMessage} from '../../reducers/chatSlice';
+import {addMessage} from '../../../reducers/chatSlice';
+import ChatMessage from './Message';
 
 const styles: StyleSheet = {
 	container: {
@@ -99,9 +99,7 @@ const Chat = () => {
 							ref={lastMessage ? setRef : null}
 							key={m.sender + m.message + m.timestamp.toISOString()}
 						>
-							<Typography>
-								{m.sender}: {m.message}
-							</Typography>
+							<ChatMessage message={m} />
 						</ListItem>
 					);
 				})}

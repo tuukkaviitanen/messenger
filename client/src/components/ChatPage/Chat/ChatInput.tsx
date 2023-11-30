@@ -1,6 +1,6 @@
 import {Button, Paper, TextField} from '@mui/material';
 import {useFormik} from 'formik';
-import {type StyleSheet} from '../../utils/types';
+import {type StyleSheet} from '../../../utils/types';
 import * as yup from 'yup';
 
 type InitialValues = {
