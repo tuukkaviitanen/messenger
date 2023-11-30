@@ -12,7 +12,7 @@ const styles: StyleSheet = {
 		flexDirection: 'column',
 		p: 1,
 		m: 1,
-		flexGrow: 1,
+		flex: 1,
 	},
 	text: {
 		textAlign: 'center',

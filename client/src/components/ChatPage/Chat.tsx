@@ -14,7 +14,7 @@ const styles: StyleSheet = {
 		display: 'flex',
 		flexDirection: 'column',
 		justifyContent: 'space-between',
-		flexGrow: 10,
+		flex: 3,
 	},
 	inputContainer: {
 		display: 'flex',
@@ -24,9 +24,8 @@ const styles: StyleSheet = {
 		p: 1,
 	},
 	chatArea: {
-		flexGrow: 1,
+		flex: 1,
 		overflow: 'auto',
-		height: 100, // This can be anything except 1, it will grow because of flexGrow
 	},
 };
 
