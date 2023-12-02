@@ -23,7 +23,7 @@ export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next
 	}
 
 	if (error instanceof QueryFailedError && error.message.includes('unique')) {
-		logger.error(error.driverError);
+		logger.log(error.driverError);
 		return res.status(400).json({error: error.driverError.detail as string});
 	}
 
