@@ -1,5 +1,5 @@
 import {type Logger as BaseLogger, type QueryRunner} from 'typeorm';
-import config from './config';
+import config from '../config';
 
 /* eslint-disable no-console */
 const info = (...params: any[]) => {

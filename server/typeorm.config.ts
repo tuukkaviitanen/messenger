@@ -1,7 +1,7 @@
 import {DataSource} from 'typeorm';
 import config from './src/utils/config';
 import path from 'node:path';
-import {DatabaseLogger} from './src/utils/logger';
+import DatabaseLogger from './src/utils/logger/DatabaseLogger';
 
 export default new DataSource({
 	type: 'postgres',
