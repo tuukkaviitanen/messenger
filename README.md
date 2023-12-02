@@ -75,7 +75,7 @@ Database schema is updated with migrations. Migrations are generated with [TypeO
 
 ### Migration from Sequelize to TypeORM
 
-Backend was using [Sequelize](https://sequelize.org/) as an ORM up to version 0.0.6.
+Backend was using [Sequelize](https://sequelize.org/) as an ORM up to version 0.0.8.
 I made the decision to migrate to TypeORM because of Sequelize's poor TypeScript support.
 
 Sequelize supports TypeScript, but the types have to be added manually and are separate from the actual Sequelize model. [See Sequelize documentation for an example](https://sequelize.org/docs/v6/other-topics/typescript/#usage). This negates the point of using types, as developer can set the types invalidly as they become really complex with relations.
