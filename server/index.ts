@@ -1,14 +1,15 @@
-import {connectToDatabase} from './src/database';
+import 'reflect-metadata';
 import config from './src/utils/config';
 import logger from './src/utils/logger';
 import server from './src/server';
+import db from './src/utils/db';
 
-const start = async () => {
-	await connectToDatabase();
-
-	server.listen(config.port, () => {
-		logger.info(`Express server listening on port ${config.port}`);
+db.createConnection()
+	.then(() => {
+		server.listen(config.port, () => {
+			logger.info(`Express server listening on port ${config.port}`);
+		});
+	})
+	.catch(error => {
+		logger.error('Database initialization failed', error);
 	});
-};
-
-void start();
