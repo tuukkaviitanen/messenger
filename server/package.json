@@ -15,7 +15,10 @@
     "test:force": "npm test -- --forceExit",
     "start:test": "cross-env NODE_ENV=test node build/index.js",
     "test:e2e": "cypress run",
-    "cypress:open": "cypress open"
+    "cypress:open": "cypress open",
+    "typeorm": "ts-node ./node_modules/typeorm/cli",
+    "migration:run": "cross-env NODE_ENV=test npm run typeorm migration:run -- -d ./typeorm.config.ts",
+    "migration:generate": "cross-env NODE_ENV=test npm run typeorm -- migration:generate src/migrations/${npm_config_name:-migration_name} -d ./typeorm.config.ts -p"
   },
   "author": "Tuukka Viitanen",
   "license": "MIT",
@@ -24,7 +27,7 @@
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.8",
     "@types/jsonwebtoken": "^9.0.5",
-    "@types/node": "^20.9.0",
+    "@types/node": "^20.10.2",
     "@types/supertest": "^2.0.16",
     "@types/uuid": "^9.0.7",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
@@ -51,10 +54,10 @@
     "express-async-errors": "^3.1.1",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
-    "sequelize": "^6.34.0",
+    "reflect-metadata": "^0.1.13",
     "socket.io": "^4.7.2",
     "ts-node": "^10.9.1",
-    "umzug": "^3.4.0",
+    "typeorm": "^0.3.17",
     "zod": "^3.22.4",
     "zod-validation-error": "^2.1.0"
   }

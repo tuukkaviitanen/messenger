@@ -1,20 +1,19 @@
 import supertest from 'supertest';
 
 import app from '../server/express';
-import {userTable, sequelize, connectToDatabase} from '../database';
 
 import {expect} from '@jest/globals';
+import {User} from '../entities/User';
+import db from '../utils/db';
 
 const api = supertest(app);
 
 const resetUsers = async () => {
-	await userTable.destroy({
-		truncate: true,
-	});
+	await User.delete({});
 };
 
 beforeAll(async () => {
-	await connectToDatabase();
+	await db.createConnection();
 });
 
 beforeEach(async () => {
@@ -30,7 +29,7 @@ describe('user api', () => {
 		});
 
 		test('should return 200 and user when found', async () => {
-			const createdUser = await userTable.create({username: 'hellouser', passwordHash: 'passwordhash'});
+			const createdUser = await User.save({username: 'hellouser', passwordHash: 'passwordhash'});
 
 			const response = await api
 				.get(`/api/users/${createdUser.id}`)
@@ -81,7 +80,7 @@ describe('user api', () => {
 				.expect(201)
 				.expect('Content-Type', /application\/json/);
 
-			const createdUser = await userTable.findOne({where: {username: user.username}});
+			const createdUser = await User.findOneBy({username: user.username});
 
 			expect(createdUser).toBeDefined();
 
@@ -170,5 +169,5 @@ describe('user api', () => {
 });
 
 afterAll(async () => {
-	await sequelize.close();
+	await db.closeConnection();
 });

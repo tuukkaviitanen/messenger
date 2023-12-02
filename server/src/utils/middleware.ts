@@ -6,9 +6,9 @@ import jwt from 'jsonwebtoken';
 import {userPublicSchema} from '../validators/UserPublic';
 import {type SocketWithUser, type RequestWithUser} from './types';
 import config from './config';
-import {DatabaseError, UniqueConstraintError} from 'sequelize';
 import logger from './logger';
 import {type Socket} from 'socket.io';
+import {QueryFailedError} from 'typeorm';
 
 export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next) => {
 	if (error instanceof ZodError) {
@@ -22,22 +22,18 @@ export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next
 		return res.status(401).json({error: error.message});
 	}
 
-	if (error instanceof UniqueConstraintError) {
-		const fieldKeys = Object.keys(error.fields);
-
-		const errorMessages = fieldKeys.map(key => `${key} '${error.fields[key] as string}' is already in use`);
-
-		logger.log(errorMessages);
-		return res.status(400).json({error: errorMessages.join(', ')});
+	if (error instanceof QueryFailedError && error.message.includes('unique')) {
+		logger.log(error.driverError);
+		return res.status(400).json({error: error.driverError.detail as string});
 	}
 
-	if (error instanceof DatabaseError) {
-		logger.error(error.message);
+	if (error instanceof QueryFailedError) {
+		logger.error(error);
 		return res.status(500).json({error: error.message});
 	}
 
 	if (error instanceof Error) {
-		logger.error(error.message);
+		logger.error(error);
 		return res.status(500).json({error: error.message});
 	}
 

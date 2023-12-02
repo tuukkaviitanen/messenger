@@ -1,10 +1,10 @@
 import {Router as createRouter} from 'express';
-import {userTable} from '../database';
+import {User} from '../entities/User';
 
 const testingRouter = createRouter();
 
 testingRouter.delete('/clearDatabase', async (req, res) => {
-	await userTable.destroy({truncate: true});
+	await User.delete({});
 	return res.sendStatus(204);
 });
 
