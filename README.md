@@ -11,7 +11,7 @@ Running as a free tier service so it might take some time to start up.
 
 Node server has a [REST API](https://www.ibm.com/topics/rest-apis) using [Express](https://expressjs.com/) and WebSockets server using [Socket.io](https://socket.io/).
 
-Users are validated and stored in a [PostgreSQL](https://www.postgresql.org/) database.
+Users are validated and stored in a [PostgreSQL](https://www.postgresql.org/) database through [TypeORM](https://typeorm.io/).
 
 REST API is used for user management and WebSockets are used to transport messages between users real-time.
 
@@ -65,11 +65,26 @@ E2E tests are important for the CI/CD pipeline. Finishing these tests successful
 
 ### User management
 
-Backend runs an express server with `/api/users` and `/api/login` endpoints. Users can be created and single users can be fetched with id. Login returns a [JsonWebToken](https://jwt.io/) that can be used for authentication in following requests.
+Backend runs an express server with `/api/users` and `/api/login` endpoints. Users can be created and single users can be fetched with id. Passwords are hashed before storage. Login returns a [JsonWebToken](https://jwt.io/) that can be used for authentication in following requests.
 
-Users are stored in a [PostgreSQL](https://www.postgresql.org/) server through [Sequelize](https://sequelize.org/). Passwords are hashed and usernames are unique.
+## Database
 
-Database schema is updated with migrations. Migrations are done using [Umzug](https://github.com/sequelize/umzug). Any new migrations run at server startup. Tests also run migrations, so broken migrations won't get through the CI/CD pipeline.
+Users are stored in a [PostgreSQL](https://www.postgresql.org/) database through [TypeORM](https://typeorm.io/).
+
+Database schema is updated with migrations. Migrations are generated with [TypeOR CLI](https://orkhan.gitbook.io/typeorm/docs/using-cli).Migrations run at server startup or manually. Tests also run migrations, so broken migrations won't get through the CI/CD pipeline.
+
+### Migration from Sequelize to TypeORM
+
+Backend was using [Sequelize](https://sequelize.org/) as an ORM up to version 0.0.6.
+I made the decision to migrate to TypeORM because of Sequelize's poor TypeScript support.
+
+Sequelize supports TypeScript, but the types have to be added manually and are separate from the actual Sequelize model. [See Sequelize documentation for an example](https://sequelize.org/docs/v6/other-topics/typescript/#usage). This negates the point of using types, as developer can set the types invalidly as they become really complex with relations.
+
+A great benefit of TypeORM is that migrations can be generated automatically. Generated migrations also consist of pure [SQL](https://en.wikipedia.org/wiki/SQL) scripts instead of being fully JavaScript/TypeScript. This let's the developer know exactly what the migrations are doing.
+
+TypeORM is a great upgrade from Sequelize as it offers more control on migrations while automating type creation and actually writing the migrations.
+
+To me personally, it feels like TypeORM abstracts more of the process, while giving the developer control on just the few things that matter, giving the developer a feeling of being in even more control.
 
 ## Frontend
 
@@ -116,6 +131,14 @@ The production version is running version 20.9.0.
    c. Run `npm test` for running tests
    d. Run `npm start:test` to start server with `test` mode (required for E2E tests)
    e. Run `npm test:e2e` to run End-to-End test while server is running in `test` mode. Run this in a separate terminal.
+
+#### Database migrations
+
+Database migrations are run automatically when running the server or tests.
+Migrations can also be run manually to testing database with `npm run migration:run`.
+Migrations can be generated with `npm run migration:generate --name=<migration name>`.
+These migration commands both use the test database so it needs to be set up. (See instructions above and in .env.template).
+Existing migrations also have to be run before generating new migrations.
 
 ### Frontend
 
