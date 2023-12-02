@@ -55,11 +55,9 @@
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
     "reflect-metadata": "^0.1.13",
-    "sequelize": "^6.34.0",
     "socket.io": "^4.7.2",
     "ts-node": "^10.9.1",
     "typeorm": "^0.3.17",
-    "umzug": "^3.4.0",
     "zod": "^3.22.4",
     "zod-validation-error": "^2.1.0"
   }

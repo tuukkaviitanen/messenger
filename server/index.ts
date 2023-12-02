@@ -1,4 +1,4 @@
-import 'reflect-metadata';
+import 'reflect-metadata'; // TypeORM requirement
 import config from './src/utils/config';
 import logger from './src/utils/logger';
 import server from './src/server';
