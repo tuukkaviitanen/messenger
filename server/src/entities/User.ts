@@ -1,5 +1,6 @@
 /* eslint-disable new-cap */
-import {Entity, PrimaryGeneratedColumn, Column, BaseEntity} from 'typeorm';
+import {Entity, PrimaryGeneratedColumn, Column, BaseEntity, ManyToMany} from 'typeorm';
+import {ChatMessage} from './ChatMessage';
 
 @Entity()
 export class User extends BaseEntity {
@@ -11,4 +12,7 @@ export class User extends BaseEntity {
 
 	@Column()
 		passwordHash!: string;
+
+	@ManyToMany(() => ChatMessage, chatMessage => chatMessage.recipients)
+		messages!: User[];
 }
