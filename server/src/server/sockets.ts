@@ -4,7 +4,8 @@ import logger from '../utils/logger';
 import {type UserPublic} from '../validators/UserPublic';
 import {tokenParserMiddleware} from '../utils/middleware';
 import {type SocketWithUser} from '../utils/types';
-import config from '../utils/config';
+import messageService from '../services/messageService';
+import userService from '../services/userService';
 
 export const attachSocketServerTo = (httpServer: HttpServer) => {
 	const io = new Server(httpServer);
@@ -30,27 +31,12 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 		content: Omit<MessageContent, 'timestamp'>,
 	): [string, MessageContent] => [SocketEvent.Message, {...content, timestamp: new Date()}];
 
-	// In test mode, initial user is created
-	let connectedUsers: UserPublic[] = (config.nodeEnv === 'test') ? [{id: '9c5b94b1-35ad-49bb-b118-8e8fc24abf8', username: 'initial-user'}] : [];
-
-	const addUser = (user: UserPublic) => {
-		connectedUsers
-			= connectedUsers.find(u => u.id === user.id) === undefined
-				? connectedUsers.concat(user)
-				: connectedUsers;
-		io.emit(SocketEvent.Users, {connectedUsers});
-	};
-
-	const removeUser = (user: UserPublic) => {
-		connectedUsers = connectedUsers.filter(u => u.id !== user.id);
-		io.emit(SocketEvent.Users, {connectedUsers});
-	};
-
 	io.on(SocketEvent.Connection, async socket => {
 		const {user} = socket as SocketWithUser;
 		await socket.join(user.id);
 
-		addUser(user);
+		userService.setOnline(user);
+		io.emit(SocketEvent.Users, {connectedUsers: userService.getAllOnline()});
 
 		logger.log(`socket ${socket.id} connected as user ${user.username}`);
 		socket.broadcast.emit(
@@ -60,7 +46,7 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 		socket.emit(
 			SocketEvent.ServerEvent,
 			{
-				message: `Welcome to the messenger app. Users currently online: ${connectedUsers
+				message: `Welcome to the messenger app. Users currently online: ${userService.getAllOnline()
 					.map(u => u.username)
 					.join(', ')}`,
 				timestamp: new Date(),
@@ -69,6 +55,7 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 		socket.on(SocketEvent.Message, ({message, recipients}: {message: string; recipients?: UserPublic[]}) => {
 			if (recipients) {
 				recipients.push(user);
+				void messageService.create({content: message, sender: user, timestamp: new Date(), recipients});
 				recipients.forEach(recipient =>
 					io.to(recipient.id).emit(
 						...createMessageEvent({
@@ -94,7 +81,8 @@ export const attachSocketServerTo = (httpServer: HttpServer) => {
 				SocketEvent.ServerEvent,
 				{message: `${user.username} left the chat`, timestamp: new Date()},
 			);
-			removeUser(user);
+			userService.setOffline(user);
+			io.emit(SocketEvent.Users, {connectedUsers: userService.getAllOnline()});
 		});
 	});
 

@@ -5,10 +5,12 @@ import app from '../server/express';
 import {expect} from '@jest/globals';
 import {User} from '../entities/User';
 import db from '../utils/db';
+import {ChatMessage} from '../entities/ChatMessage';
 
 const api = supertest(app);
 
-const resetUsers = async () => {
+const resetDatabase = async () => {
+	await ChatMessage.delete({});
 	await User.delete({});
 };
 
@@ -17,7 +19,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-	await resetUsers();
+	await resetDatabase();
 });
 
 describe('user api', () => {

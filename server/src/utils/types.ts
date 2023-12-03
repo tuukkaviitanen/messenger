@@ -9,3 +9,10 @@ export type RequestWithUser = {
 export type SocketWithUser = {
 	user: UserPublic;
 } & Socket;
+
+export type Message = {
+	content: string;
+	sender: UserPublic;
+	timestamp: Date;
+	recipients?: UserPublic[];
+};
