@@ -7,7 +7,7 @@ export default class DatabaseLogger implements BaseLogger {
 
 	logQueryError(error: string | Error, query: string, parameters?: any[] | undefined, queryRunner?: QueryRunner | undefined) {
 		const errorMessage = (error instanceof Error) ? error.message : error;
-		logger.warn('Database error', {error: errorMessage, query, parameters});
+		logger.info('Database error', {error: errorMessage, query, parameters});
 	}
 
 	logQuerySlow(time: number, query: string, parameters?: any[] | undefined, queryRunner?: QueryRunner | undefined) {

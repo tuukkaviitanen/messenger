@@ -69,9 +69,17 @@ Backend runs an express server with `/api/users` and `/api/login` endpoints. Use
 
 ## Database
 
-Users are stored in a [PostgreSQL](https://www.postgresql.org/) database through [TypeORM](https://typeorm.io/).
+Users and Messages are stored in a [PostgreSQL](https://www.postgresql.org/) database through [TypeORM](https://typeorm.io/).
 
-Database schema is updated with migrations. Migrations are generated with [TypeOR CLI](https://orkhan.gitbook.io/typeorm/docs/using-cli).Migrations run at server startup or manually. Tests also run migrations, so broken migrations won't get through the CI/CD pipeline.
+Database schema is updated with migrations. Migrations are generated with [TypeORM CLI](https://orkhan.gitbook.io/typeorm/docs/using-cli). Migrations run at server startup or manually. Tests also run migrations, so broken migrations won't get through the CI/CD pipeline.
+
+### Encryption
+
+Private messages are stored to database so they can be restored after a page refresh or logging back in.
+(Restoring chats is not yet implemented as of 2023-12-03 but coming soon!).
+To keep private messages actually private, message contents are encrypted with an AES-256 encryption before storage. Column encryption is done using [typeorm-encrypted](https://www.npmjs.com/package/typeorm-encrypted).
+
+This prevents reading plain text messages from the database. Server-side SECRET environment variable (hashed with SHA-256) is needed to decrypt the message.
 
 ### Migration from Sequelize to TypeORM
 
@@ -96,12 +104,11 @@ Frontend is built with [React](https://react.dev/) and styled with [Material UI]
 
 [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) is not needed even when running the client in development mode as Vite is configured to proxy these connections to server port and to change the origin. This works for both HTTP and WebSocket connections.
 
-# Planned
+## Planned
 
+- Restore private chats from database when user connects
 - Group chats to frontend
    - Functionality already exists on the server
-- Saving chats to database
-  - Maybe encryption of some kind
 - Full CRUD-actions to users in API
 - Containerizing the whole application using [Docker](https://www.docker.com/)
 - Component tests to frontend?

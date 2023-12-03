@@ -2,15 +2,16 @@
 import {type Socket as ClientSocket, io as clientIo} from 'socket.io-client';
 import {type Server as HttpServer, createServer} from 'node:http';
 import {type Server} from 'socket.io';
-import {attachSocketServerTo} from '../server/sockets';
+import {attachSocketServerTo} from '../routes/socketRoutes';
 import {type AddressInfo} from 'node:net';
-import app from '../server/express';
+import {app} from '../server';
 import supertest from 'supertest';
 
 import {expect, describe, it} from '@jest/globals';
 import {type UserPublic} from '../validators/UserPublic';
 import db from '../utils/db';
 import {User} from '../entities/User';
+import {ChatMessage} from '../entities/ChatMessage';
 
 type UserInfo = {
 	username: string;
@@ -71,6 +72,11 @@ const assertServerEventContent = (args: any, expectedMessage: string) => {
 	expect((args.message as string)).toBe(expectedMessage);
 };
 
+const resetDatabase = async () => {
+	await ChatMessage.delete({});
+	await User.delete({});
+};
+
 describe('websocket events', () => {
 	let primaryClientSocket: ClientSocket;
 	let secondaryClientSocket: ClientSocket;
@@ -80,15 +86,17 @@ describe('websocket events', () => {
 
 	const primaryUser: UserInfo = {username: 'test user 1', password: 'test password 1'};
 	const secondaryUser: UserInfo = {username: 'test user 2', password: 'test password 2'};
+	const passiveUser: UserInfo = {username: 'test user 3', password: 'test password 3'};
 
 	beforeAll(async () => {
 		await db.createConnection();
-		await User.delete({});
+		await resetDatabase();
 
 		const api = supertest(app);
 
 		await createUser(api, primaryUser);
 		await createUser(api, secondaryUser);
+		await createUser(api, passiveUser);
 	});
 
 	beforeEach(done => {
@@ -166,7 +174,7 @@ describe('websocket events', () => {
 	describe('server-event', () => {
 		it('should receive welcome message on connect', done => {
 			secondaryClientSocket.on('server-event', args => {
-				assertServerEventContent(args, 'Welcome to the messenger app. Users currently online: initial-user, test user 1, test user 2');
+				assertServerEventContent(args, 'Welcome to the messenger app. Users currently online: test user 1, test user 2');
 				setTimeout(done, 100); // Timeout prevents handles from being left open; according to Jest
 			});
 
@@ -225,7 +233,7 @@ describe('websocket events', () => {
 
 		it('should NOT send message to other than recipient', done => {
 			const message = 'private message test';
-			const recipients = [{username: 'initial-user', id: 'test-id'}];
+			const recipients = [{username: passiveUser.username, id: passiveUser.id!}];
 
 			const messages: any[] = [];
 

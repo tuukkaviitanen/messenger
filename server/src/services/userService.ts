@@ -43,13 +43,32 @@ const getToken = async ({username, password}: UserCredentials): Promise<string> 
 
 	const tokenContent: UserPublic = {id: user.id, username: user.username};
 
-	const secret = config.jwtSecret;
+	const {secret} = config;
 
 	const token = jwt.sign(tokenContent, secret);
 
 	return token;
 };
 
-const userService = {getAll, getSingle, create, getToken};
+let onlineUsers: UserPublic[] = [];
+
+const getAllOnline = () => onlineUsers;
+
+const setOnline = (user: UserPublic) => {
+	onlineUsers
+		= onlineUsers.find(u => u.id === user.id) === undefined
+			? onlineUsers.concat(user)
+			: onlineUsers;
+};
+
+const setOffline = (user: UserPublic) => {
+	onlineUsers = onlineUsers.filter(u => u.id !== user.id);
+};
+
+const clearAllOnlineUsers = () => {
+	onlineUsers = [];
+};
+
+const userService = {getAll, getSingle, create, getToken, getAllOnline, setOnline, setOffline, clearAllOnlineUsers};
 
 export default userService;

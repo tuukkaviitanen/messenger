@@ -9,3 +9,26 @@ export type RequestWithUser = {
 export type SocketWithUser = {
 	user: UserPublic;
 } & Socket;
+
+export type Message = {
+	content: string;
+	sender: UserPublic;
+	timestamp: Date;
+	recipients?: UserPublic[];
+};
+
+export enum SocketEvent {
+	Connection = 'connection',
+	Disconnect = 'disconnect',
+	Message = 'message',
+	Users = 'users',
+	ServerEvent = 'server-event',
+	Error = 'error',
+}
+
+export type MessageContent = {
+	sender: string;
+	message: string;
+	recipients?: UserPublic[];
+	timestamp: Date;
+};

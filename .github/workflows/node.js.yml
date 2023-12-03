@@ -34,7 +34,7 @@ jobs:
 
     env:
       POSTGRES_URL_TEST: postgres://postgres:postgres@localhost:5432/postgres
-      JWT_SECRET: = test_secret
+      SECRET: = test_secret
 
     strategy:
       matrix:

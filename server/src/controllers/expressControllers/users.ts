@@ -1,7 +1,7 @@
 import {Router as createRouter} from 'express';
 
-import userService from '../services/userService';
-import {userCredentialsSchemaWithMinMax} from '../validators/UserCredentials';
+import userService from '../../services/userService';
+import {userCredentialsSchemaWithMinMax} from '../../validators/UserCredentials';
 
 const usersRouter = createRouter();
 

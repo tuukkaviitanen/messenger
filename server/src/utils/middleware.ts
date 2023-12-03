@@ -41,7 +41,7 @@ export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next
 };
 
 const parseUserFromToken = (token: string) => {
-	const decodedToken: unknown = jwt.verify(token, config.jwtSecret);
+	const decodedToken: unknown = jwt.verify(token, config.secret);
 
 	const user = userPublicSchema.parse(decodedToken);
 

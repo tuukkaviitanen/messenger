@@ -1,10 +1,19 @@
+import {userPublicSchema} from '../../src/validators/UserPublic';
+
 describe('chat page', () => {
 	describe('chats', () => {
+		const user = {username: 'initial-user', password: 'initial-password'};
+
 		beforeEach(() => {
 			cy.request('DELETE', '/api/testing/clearDatabase');
-			cy.visit('/');
-			cy.register('TestUser', 'TestPassword');
-			cy.login('TestUser', 'TestPassword');
+
+			cy.request('POST', '/api/users', user).then(response => {
+				const user = userPublicSchema.parse(response.body);
+				cy.request('POST', '/api/testing/setUserOnline', user);
+				cy.visit('/');
+				cy.register('TestUser', 'TestPassword');
+				cy.login('TestUser', 'TestPassword');
+			});
 		});
 
 		it('sending message at start shows message in global chat', () => {
