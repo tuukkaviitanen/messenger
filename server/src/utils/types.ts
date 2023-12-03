@@ -16,3 +16,18 @@ export type Message = {
 	timestamp: Date;
 	recipients?: UserPublic[];
 };
+
+export enum SocketEvent {
+	Connection = 'connection',
+	Disconnect = 'disconnect',
+	Message = 'message',
+	Users = 'users',
+	ServerEvent = 'server-event',
+}
+
+export type MessageContent = {
+	sender: string;
+	message: string;
+	recipients?: UserPublic[];
+	timestamp: Date;
+};

@@ -2,9 +2,9 @@
 import {type Socket as ClientSocket, io as clientIo} from 'socket.io-client';
 import {type Server as HttpServer, createServer} from 'node:http';
 import {type Server} from 'socket.io';
-import {attachSocketServerTo} from '../server/sockets';
+import {attachSocketServerTo} from '../routes/socketRoutes';
 import {type AddressInfo} from 'node:net';
-import app from '../server/express';
+import {app} from '../server';
 import supertest from 'supertest';
 
 import {expect, describe, it} from '@jest/globals';

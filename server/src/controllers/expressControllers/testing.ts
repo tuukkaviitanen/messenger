@@ -1,9 +1,9 @@
 import {Router as createRouter} from 'express';
-import {User} from '../entities/User';
-import {userPublicSchema} from '../validators/UserPublic';
-import userService from '../services/userService';
-import {ChatMessage} from '../entities/ChatMessage';
-import logger from '../utils/logger';
+import {User} from '../../entities/User';
+import {userPublicSchema} from '../../validators/UserPublic';
+import userService from '../../services/userService';
+import {ChatMessage} from '../../entities/ChatMessage';
+import logger from '../../utils/logger';
 
 const testingRouter = createRouter();
 

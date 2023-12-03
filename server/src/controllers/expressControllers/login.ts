@@ -1,6 +1,6 @@
 import {Router as createRouter} from 'express';
-import {userCredentialsSchema} from '../validators/UserCredentials';
-import userService from '../services/userService';
+import {userCredentialsSchema} from '../../validators/UserCredentials';
+import userService from '../../services/userService';
 
 const loginRouter = createRouter();
 

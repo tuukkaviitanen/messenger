@@ -1,7 +1,5 @@
 import supertest from 'supertest';
-
-import app from '../server/express';
-
+import {app} from '../server';
 import {expect} from '@jest/globals';
 import {User} from '../entities/User';
 import db from '../utils/db';
