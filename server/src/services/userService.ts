@@ -43,7 +43,7 @@ const getToken = async ({username, password}: UserCredentials): Promise<string> 
 
 	const tokenContent: UserPublic = {id: user.id, username: user.username};
 
-	const secret = config.jwtSecret;
+	const {secret} = config;
 
 	const token = jwt.sign(tokenContent, secret);
 
