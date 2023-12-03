@@ -23,6 +23,7 @@ export enum SocketEvent {
 	Message = 'message',
 	Users = 'users',
 	ServerEvent = 'server-event',
+	Error = 'error',
 }
 
 export type MessageContent = {

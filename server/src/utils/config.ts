@@ -14,11 +14,13 @@ const nodeEnv = process.env.NODE_ENV;
 
 const postgresUrl = (nodeEnv === 'test') ? postgresUrlTesting : postgresUrlProduction;
 
-if (!jwtSecret || !postgresUrl || !nodeEnv) {
+const dbSecret = process.env.DB_SECRET;
+
+if (!jwtSecret || !postgresUrl || !nodeEnv || !dbSecret) {
 	logger.error('All required env variables are not set!');
 	process.exit(1);
 }
 
-const config = {port, jwtSecret, postgresUrl, nodeEnv};
+const config = {port, jwtSecret, postgresUrl, nodeEnv, dbSecret};
 
 export default config;
