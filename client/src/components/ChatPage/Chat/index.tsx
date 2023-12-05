@@ -82,10 +82,17 @@ const Chat = () => {
 			logoutUser();
 		});
 
+		socket?.on(SocketEvent.RestoreMessages, ({messages}: {messages: MessageContent[]}) => {
+			messages.forEach(({sender, message, timestamp, recipients}: MessageContent) => {
+				dispatch(addMessage({message: {message, sender, timestamp: new Date(timestamp)}, recipients}));
+			});
+		});
+
 		return () => {
 			socket?.off(SocketEvent.Message);
 			socket?.off(SocketEvent.ConnectionError);
 			socket?.off(SocketEvent.ServerEvent);
+			socket?.off(SocketEvent.RestoreMessages);
 		};
 	}, [socket, messages, dispatch, logoutUser]);
 

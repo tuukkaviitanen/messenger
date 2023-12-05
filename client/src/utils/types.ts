@@ -27,6 +27,7 @@ export enum SocketEvent {
 	ConnectionError = 'connect_error',
 	Users = 'users',
 	ServerEvent = 'server-event',
+	RestoreMessages = 'restore-messages',
 }
 
 export type Chat = {
