@@ -14,5 +14,5 @@ export class User extends BaseEntity {
 		passwordHash!: string;
 
 	@ManyToMany(() => ChatMessage, chatMessage => chatMessage.recipients)
-		messages!: User[];
+		messages!: ChatMessage[];
 }

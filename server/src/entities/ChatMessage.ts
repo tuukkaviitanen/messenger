@@ -19,7 +19,7 @@ export class ChatMessage extends BaseEntity {
 	@JoinColumn()
 		sender!: User;
 
-	@ManyToMany(() => User, {eager: true})
+	@ManyToMany(() => User, user => user.messages, {eager: true})
 	@JoinTable()
 		recipients!: User[];
 }
