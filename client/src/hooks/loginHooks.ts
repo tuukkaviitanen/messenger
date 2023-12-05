@@ -3,6 +3,7 @@ import {removeCurrentUser, setCurrentUser} from '../reducers/userSlicer';
 import {localStorageKeys} from '../utils/constants';
 import {type UserWithToken} from '../validators/UserWithToken';
 import {useAppDispatch} from './typedReduxHooks';
+import {clearChats} from '../reducers/chatSlice';
 
 export const useLogoutUser = () => {
 	const dispatch = useAppDispatch();
@@ -10,6 +11,7 @@ export const useLogoutUser = () => {
 	const logoutUser = useCallback(() => {
 		window.localStorage.removeItem(localStorageKeys.currentUser);
 		dispatch(removeCurrentUser());
+		dispatch(clearChats());
 	}, [dispatch]);
 
 	return logoutUser;

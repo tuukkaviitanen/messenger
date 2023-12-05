@@ -38,10 +38,13 @@ const chatSlice = createSlice({
 		setSelectedChatIndex(state, action: PayloadAction<number>) {
 			state.selectedChatIndex = action.payload;
 		},
+		clearChats() {
+			return initialState;
+		},
 	},
 });
 
-export const {addChat, addMessage, setSelectedChatIndex} = chatSlice.actions;
+export const {addChat, addMessage, setSelectedChatIndex, clearChats} = chatSlice.actions;
 
 const chatReducer = chatSlice.reducer;
 

@@ -37,7 +37,7 @@ const App = () => {
 			console.error('Parsed user invalid');
 			return;
 		}
-		console.log('useEffect called')
+
 		loginUser(user.data);
 	}, [loginUser]);
 
