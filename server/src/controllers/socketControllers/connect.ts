@@ -2,8 +2,19 @@ import {type Server, type Socket} from 'socket.io';
 import {type UserPublic} from '../../validators/UserPublic';
 import userService from '../../services/userService';
 import logger from '../../utils/logger';
-import {SocketEvent, type MessageContent} from '../../utils/types';
-import {User} from '../../entities/User';
+import {SocketEvent} from '../../utils/types';
+import messageService from '../../services/messageService';
+
+const sendStoredMessages = async (socket: Socket, user: UserPublic) => {
+	try {
+		const messages = await messageService.getAllByUser(user.id);
+		socket.emit(SocketEvent.RestoreMessages, {
+			messages,
+		});
+	} catch (error) {
+		logger.error('Error getting messages!', error);
+	}
+};
 
 const connectHandler = async (io: Server, socket: Socket, user: UserPublic) => {
 	await socket.join(user.id);
@@ -25,25 +36,8 @@ const connectHandler = async (io: Server, socket: Socket, user: UserPublic) => {
 		timestamp: new Date(),
 	});
 
-	const storedUser = await User.findOne({
-		where: {id: user.id},
-		relations: {messages: true},
-	});
-
-	// This parses the database entity into a DTO
-	const messages: MessageContent[] = storedUser?.messages.map(message => ({
-		message: message.content,
-		timestamp: message.timestamp,
-		sender: message.sender.username,
-		recipients: message.recipients.map(r => ({
-			id: r.id,
-			username: r.username,
-		})).filter(r => r.id !== user.id),
-	})) ?? [];
-
-	socket.emit(SocketEvent.RestoreMessages, {
-		messages,
-	});
+	// Awaiting database calls will block the event from finishing
+	void sendStoredMessages(socket, user);
 };
 
 export default connectHandler;

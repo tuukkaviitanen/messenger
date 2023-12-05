@@ -9,7 +9,7 @@ import config from './config';
 import logger from './logger';
 import {type Socket} from 'socket.io';
 import {QueryFailedError} from 'typeorm';
-import {User} from '../entities/User';
+import userService from '../services/userService';
 
 export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next) => {
 	if (error instanceof ZodError) {
@@ -46,7 +46,7 @@ const parseUserFromToken = async (token: string) => {
 
 	const user = userPublicSchema.parse(decodedToken);
 
-	const userInDb = await User.findOneBy({id: user.id});
+	const userInDb = await userService.getSingle(user.id);
 	if (!userInDb) {
 		throw new Error(`User ${user.username} is not stored in the database`);
 	}
