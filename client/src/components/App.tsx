@@ -5,12 +5,12 @@ import ChatPage from './ChatPage';
 
 import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {useAppDispatch, useAppSelector} from '../hooks/typedReduxHooks';
+import {useAppSelector} from '../hooks/typedReduxHooks';
 import {localStorageKeys} from '../utils/constants';
 import {useEffect} from 'react';
 import {userWithTokenSchema} from '../validators/UserWithToken';
-import {setCurrentUser} from '../reducers/userSlicer';
 import {type StyleSheet} from '../utils/types';
+import {useLoginUser} from '../hooks/loginHooks';
 
 const styles: StyleSheet = {
 	container: {
@@ -21,7 +21,7 @@ const styles: StyleSheet = {
 const App = () => {
 	const currentUser = useAppSelector(state => state.user.currentUser);
 
-	const dispatch = useAppDispatch();
+	const loginUser = useLoginUser();
 
 	useEffect(() => {
 		const localStorageUser = window.localStorage.getItem(
@@ -37,9 +37,9 @@ const App = () => {
 			console.error('Parsed user invalid');
 			return;
 		}
-
-		dispatch(setCurrentUser(user.data));
-	}, [dispatch]);
+		console.log('useEffect called')
+		loginUser(user.data);
+	}, [loginUser]);
 
 	return (
 		<>
