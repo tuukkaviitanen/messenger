@@ -9,6 +9,7 @@ import config from './config';
 import logger from './logger';
 import {type Socket} from 'socket.io';
 import {QueryFailedError} from 'typeorm';
+import {User} from '../entities/User';
 
 export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next) => {
 	if (error instanceof ZodError) {
@@ -40,20 +41,25 @@ export const errorHandler: ErrorRequestHandler = (error: unknown, req, res, next
 	next(error);
 };
 
-const parseUserFromToken = (token: string) => {
+const parseUserFromToken = async (token: string) => {
 	const decodedToken: unknown = jwt.verify(token, config.secret);
 
 	const user = userPublicSchema.parse(decodedToken);
 
+	const userInDb = await User.findOneBy({id: user.id});
+	if (!userInDb) {
+		throw new Error(`User ${user.username} is not stored in the database`);
+	}
+
 	return user;
 };
 
-export const parseToken = (req: RequestWithUser, res: Response, next: NextFunction) => {
+export const parseToken = async (req: RequestWithUser, res: Response, next: NextFunction) => {
 	const token = req.headers.authorization?.replace(/^bearer /i, '');
 
 	if (token) {
 		try {
-			const user = parseUserFromToken(token);
+			const user = await parseUserFromToken(token);
 
 			req.user = user;
 		} catch (error) {
@@ -65,7 +71,7 @@ export const parseToken = (req: RequestWithUser, res: Response, next: NextFuncti
 	next();
 };
 
-export const tokenParserMiddleware = (socket: Socket, next: (err?: Error) => void) => {
+export const tokenParserMiddleware = async (socket: Socket, next: (err?: Error) => void) => {
 	const {token} = socket.handshake.auth;
 
 	if (!token) {
@@ -79,9 +85,14 @@ export const tokenParserMiddleware = (socket: Socket, next: (err?: Error) => voi
 	}
 
 	try {
-		(socket as SocketWithUser).user = parseUserFromToken(token);
+		(socket as SocketWithUser).user = await parseUserFromToken(token);
+
 		next();
 	} catch (ex) {
-		next(new Error('Token invalid'));
+		if (ex instanceof Error) {
+			next(ex);
+		} else {
+			next(new Error('User confirmation failed'));
+		}
 	}
 };
