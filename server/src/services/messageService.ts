@@ -1,8 +1,28 @@
 import {ChatMessage} from '../entities/ChatMessage';
-import {type Message} from '../utils/types';
+import {User} from '../entities/User';
+import {type MessageContent, type Message} from '../utils/types';
 
 const getAllByUser = async (userId: string) => {
-	const messages = await ChatMessage.find({where: {id: userId}});
+	// This parses the database entity into a DTO
+
+	const user = await User.findOne({
+		where: {id: userId},
+		relations: {messages: true},
+	});
+
+	if (!user) {
+		throw new Error('User not found in database');
+	}
+
+	const messages: MessageContent[] = user.messages?.map(message => ({
+		message: message.content,
+		timestamp: message.timestamp,
+		sender: message.sender.username,
+		recipients: message.recipients.map(r => ({
+			id: r.id,
+			username: r.username,
+		})).filter(r => r.id !== userId),
+	})) ?? [];
 
 	return messages;
 };
