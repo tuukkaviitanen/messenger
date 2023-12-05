@@ -76,7 +76,6 @@ Database schema is updated with migrations. Migrations are generated with [TypeO
 ### Encryption
 
 Private messages are stored to database so they can be restored after a page refresh or logging back in.
-(Restoring chats is not yet implemented as of 2023-12-03 but coming soon!).
 To keep private messages actually private, message contents are encrypted with an AES-256 encryption before storage. Column encryption is done using [typeorm-encrypted](https://www.npmjs.com/package/typeorm-encrypted).
 
 This prevents reading plain text messages from the database. Server-side SECRET environment variable (hashed with SHA-256) is needed to decrypt the message.
@@ -106,7 +105,8 @@ Frontend is built with [React](https://react.dev/) and styled with [Material UI]
 
 ## Planned
 
-- Restore private chats from database when user connects
+- Store global chat on server for an hour
+   - Maybe using [Redis](https://redis.io/)?
 - Group chats to frontend
    - Functionality already exists on the server
 - Full CRUD-actions to users in API
