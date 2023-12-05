@@ -2,15 +2,14 @@ import * as yup from 'yup';
 
 import FormBase, {type FormikOnSubmit} from './FormBase';
 import loginService from '../../services/loginService';
-import {setCurrentUser} from '../../reducers/userSlicer';
 import {toast} from 'react-toastify';
 import axios from 'axios';
 import {type ExpectedAxiosErrorResponse} from '../../utils/types';
-import {useAppDispatch} from '../../hooks/typedReduxHooks';
 import {Box} from '@mui/material';
+import {useLoginUser} from '../../hooks/loginHooks';
 
 const LoginForm = () => {
-	const dispatch = useAppDispatch();
+	const loginUser = useLoginUser();
 
 	const validationSchema = yup.object({
 		username: yup.string().required('Username is required'),
@@ -21,7 +20,7 @@ const LoginForm = () => {
 		const toastId = toast.loading(`Logging in as ${credentials.username}`);
 		try {
 			const currentUser = await loginService.login(credentials);
-			dispatch(setCurrentUser(currentUser));
+			loginUser(currentUser);
 			toast.update(toastId, {
 				render: `Successfully logged in as ${credentials.username}`,
 				type: 'success',

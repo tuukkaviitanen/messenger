@@ -183,6 +183,10 @@ describe('websocket events', () => {
 
 		it('should receive joined message when another user connects', done => {
 			primaryClientSocket.on('server-event', args => {
+				if ((args.message as string).includes('Welcome')) {
+					return;
+				}
+
 				assertServerEventContent(args, 'test user 2 joined the chat');
 				setTimeout(done, 100); // Timeout prevents handles from being left open; according to Jest
 			});
@@ -192,7 +196,7 @@ describe('websocket events', () => {
 
 		it('should receive left message when another user disconnects', done => {
 			primaryClientSocket.on('server-event', args => {
-				if (args.message === 'test user 2 joined the chat') {
+				if (args.message === 'test user 2 joined the chat' || (args.message as string).includes('Welcome')) {
 					return;
 				}
 
