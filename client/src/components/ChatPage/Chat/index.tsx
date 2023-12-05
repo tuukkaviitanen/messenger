@@ -8,6 +8,8 @@ import {useAppDispatch, useAppSelector} from '../../../hooks/typedReduxHooks';
 import ChatInput, {type OnSubmit} from './ChatInput';
 import {addMessage} from '../../../reducers/chatSlice';
 import ChatMessage from './ChatMessage';
+import {useLogoutUser} from '../../../hooks/loginHooks';
+import {toast} from 'react-toastify';
 
 const styles: StyleSheet = {
 	container: {
@@ -35,6 +37,8 @@ const Chat = () => {
 	const selectedChatIndex = useAppSelector(state => state.chat.selectedChatIndex);
 
 	const chats = useAppSelector(state => state.chat.chats);
+
+	const logoutUser = useLogoutUser();
 
 	const chat = chats[selectedChatIndex];
 
@@ -74,7 +78,8 @@ const Chat = () => {
 		});
 
 		socket?.on(SocketEvent.ConnectionError, error => {
-			dispatch(addMessage({message: {message: error.message, sender: 'connection', timestamp: new Date()}}));
+			toast.error(`User logged out due to a connection error: ${error.message}`);
+			logoutUser();
 		});
 
 		return () => {
@@ -82,7 +87,7 @@ const Chat = () => {
 			socket?.off(SocketEvent.ConnectionError);
 			socket?.off(SocketEvent.ServerEvent);
 		};
-	}, [socket, messages, dispatch]);
+	}, [socket, messages, dispatch, logoutUser]);
 
 	const handleSendMessage: OnSubmit = ({messageField}, {resetForm}) => {
 		socket?.emit(SocketEvent.Message, {message: messageField, recipients: chat.recipients});
