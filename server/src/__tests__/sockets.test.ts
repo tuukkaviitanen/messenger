@@ -1,3 +1,4 @@
+/* eslint-disable max-nested-callbacks */
 
 import {type Socket as ClientSocket, io as clientIo} from 'socket.io-client';
 import {type Server as HttpServer, createServer} from 'node:http';
@@ -17,6 +18,7 @@ describe('websocket events', () => {
 	let primaryClientSocket: ClientSocket;
 	let secondaryClientSocket: ClientSocket;
 	let httpServer: HttpServer;
+	let serverUrl: string;
 
 	let io: Server;
 
@@ -41,7 +43,7 @@ describe('websocket events', () => {
 
 		httpServer.listen(() => {
 			const {port} = httpServer.address() as AddressInfo;
-			const serverUrl = `http://localhost:${port}`;
+			serverUrl = `http://localhost:${port}`;
 
 			primaryClientSocket = clientIo(serverUrl, {auth: {token: primaryUser.token}});
 
@@ -197,8 +199,10 @@ describe('websocket events', () => {
 	});
 
 	describe('users', () => {
+		type UsersEventContent = {connectedUsers: UserPublic[]};
+
 		it('should be sent when user joins', done => {
-			primaryClientSocket.on(SocketEvent.Users, ({connectedUsers}: {connectedUsers: UserPublic[]}) => {
+			primaryClientSocket.on(SocketEvent.Users, ({connectedUsers}: UsersEventContent) => {
 				if (connectedUsers.length === 1) { // Skip initial event
 					return;
 				}
@@ -211,12 +215,31 @@ describe('websocket events', () => {
 		});
 
 		it('should be sent when user leaves', done => {
-			primaryClientSocket.on(SocketEvent.Users, ({connectedUsers}: {connectedUsers: UserPublic[]}) => {
+			primaryClientSocket.on(SocketEvent.Users, ({connectedUsers}: UsersEventContent) => {
 				expect(connectedUsers).toHaveLength(1);
 				done();
 			});
 
 			secondaryClientSocket.connect();
+		});
+
+		it('should send single user every time when same user connects (and disconnects) with multiple clients', done => {
+			secondaryClientSocket = clientIo(serverUrl, {auth: {token: primaryUser.token}, forceNew: true});
+
+			const userEvents: UsersEventContent[] = [];
+
+			primaryClientSocket.on(SocketEvent.Users, (content: UsersEventContent) => {
+				userEvents.push(content);
+			});
+
+			secondaryClientSocket.on('connect', () => {
+				secondaryClientSocket.disconnect();
+				setTimeout(() => {
+					expect(userEvents).toHaveLength(3); // Should have events from: first client connects, second clients connects, second client disconnects
+					expect(userEvents.map(c => c.connectedUsers).every(u => u.length === 1)).toBe(true); // In every message, there should be only one user online
+					done();
+				}, 500);
+			});
 		});
 	});
 });
