@@ -12,6 +12,7 @@ import {type UserPublic} from '../validators/UserPublic';
 import db from '../utils/db';
 import {User} from '../entities/User';
 import {ChatMessage} from '../entities/ChatMessage';
+import {SocketEvent} from '../utils/types';
 
 type UserInfo = {
 	username: string;
@@ -124,8 +125,12 @@ describe('websocket events', () => {
 		httpServer.close();
 	});
 
-	afterAll(async () => {
-		await db.closeConnection();
+	afterAll(done => {
+		// Message storing is not awaited so it needs to be waited to finish
+		setTimeout(async () => {
+			await db.closeConnection();
+			done();
+		}, 500);
 	});
 
 	describe('message', () => {
@@ -253,6 +258,30 @@ describe('websocket events', () => {
 				expect(messages).toHaveLength(0);
 				done();
 			}, 500);
+		});
+	});
+
+	describe('users', () => {
+		it('should be sent when user joins', done => {
+			primaryClientSocket.on(SocketEvent.Users, ({connectedUsers}: {connectedUsers: UserPublic[]}) => {
+				if (connectedUsers.length === 1) { // Skip initial event
+					return;
+				}
+
+				expect(connectedUsers).toHaveLength(2);
+				done();
+			});
+
+			secondaryClientSocket.connect();
+		});
+
+		it('should be sent when user leaves', done => {
+			primaryClientSocket.on(SocketEvent.Users, ({connectedUsers}: {connectedUsers: UserPublic[]}) => {
+				expect(connectedUsers).toHaveLength(1);
+				done();
+			});
+
+			secondaryClientSocket.connect();
 		});
 	});
 });
