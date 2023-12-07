@@ -7,7 +7,7 @@ import {type AddressInfo} from 'node:net';
 import {app} from '../server';
 import supertest from 'supertest';
 
-import {expect, describe, it} from '@jest/globals';
+import {expect, describe, it, beforeAll, beforeEach, afterAll, afterEach} from '@jest/globals';
 import {type UserPublic} from '../validators/UserPublic';
 import db from '../utils/db';
 import {User} from '../entities/User';
