@@ -11,6 +11,7 @@ import {useEffect} from 'react';
 import {userWithTokenSchema} from '../validators/UserWithToken';
 import {type StyleSheet} from '../utils/types';
 import {useLoginUser} from '../hooks/loginHooks';
+import toastifyConfig from '../../toastify.config';
 
 const styles: StyleSheet = {
 	container: {
@@ -58,7 +59,7 @@ const App = () => {
 					<Route path='*' element={<Navigate to='/' replace />} />
 				</Routes>
 			</Container>
-			<ToastContainer position='top-center' />
+			<ToastContainer {...toastifyConfig}/>
 		</>
 	);
 };

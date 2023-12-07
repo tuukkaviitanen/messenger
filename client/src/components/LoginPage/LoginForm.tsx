@@ -7,6 +7,7 @@ import axios from 'axios';
 import {type ExpectedAxiosErrorResponse} from '../../utils/types';
 import {Box} from '@mui/material';
 import {useLoginUser} from '../../hooks/loginHooks';
+import toastifyConfig from '../../../toastify.config';
 
 const LoginForm = () => {
 	const loginUser = useLoginUser();
@@ -23,9 +24,8 @@ const LoginForm = () => {
 			loginUser(currentUser);
 			toast.update(toastId, {
 				render: `Successfully logged in as ${credentials.username}`,
-				type: 'success',
-				isLoading: false,
-				autoClose: 5000,
+				type: toast.TYPE.SUCCESS,
+				...toastifyConfig,
 			});
 		} catch (ex) {
 			let message: string | undefined;
@@ -38,9 +38,8 @@ const LoginForm = () => {
 
 			toast.update(toastId, {
 				render: message,
-				type: 'error',
-				isLoading: false,
-				autoClose: 5000,
+				type: toast.TYPE.ERROR,
+				...toastifyConfig,
 			});
 			console.error('login failed', ex);
 		} finally {
