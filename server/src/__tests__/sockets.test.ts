@@ -1,86 +1,24 @@
+/* eslint-disable max-nested-callbacks */
 
 import {type Socket as ClientSocket, io as clientIo} from 'socket.io-client';
 import {type Server as HttpServer, createServer} from 'node:http';
 import {type Server} from 'socket.io';
-import {attachSocketServerTo} from '../routes/socketRoutes';
 import {type AddressInfo} from 'node:net';
-import {app} from '../server';
 import supertest from 'supertest';
+import {expect, describe, it, beforeAll, beforeEach, afterAll, afterEach} from '@jest/globals';
 
-import {expect, describe, it} from '@jest/globals';
+import {app} from '../server';
+import {attachSocketServerTo} from '../routes/socketRoutes';
 import {type UserPublic} from '../validators/UserPublic';
 import db from '../utils/db';
-import {User} from '../entities/User';
-import {ChatMessage} from '../entities/ChatMessage';
-
-type UserInfo = {
-	username: string;
-	password: string;
-	token?: string;
-	id?: string;
-};
-
-const createUser = async (api: supertest.SuperTest<supertest.Test>, userInfo: UserInfo) => {
-	const {username, password} = userInfo;
-
-	const user = {
-		username,
-		password,
-	};
-
-	const result = await api
-		.post('/api/users')
-		.send(user)
-		.expect(201);
-
-	userInfo.id = (result.body.id as string);
-
-	const response = await api
-		.post('/api/login')
-		.send(user)
-		.expect(200);
-
-	expect(response.body).toHaveProperty('token');
-	expect(typeof response.body.token === 'string').toBe(true);
-
-	userInfo.token = (response.body.token as string);
-};
-
-const assertMessageContent = (args: any, expectedMessage: string, expectedUser: string, expectedRecipients: UserPublic[] | undefined = undefined) => {
-	expect(args).toHaveProperty('message');
-	expect(args).toHaveProperty('sender');
-	expect(args).toHaveProperty('timestamp');
-	expect(args.message).toBe(expectedMessage);
-	expect(args.sender).toBe(expectedUser);
-	expect(typeof args.timestamp === 'string').toBe(true);
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-	expect(Date.parse(args.timestamp) / 1000).toBeCloseTo(new Date().getTime() / 1000, 0);
-
-	expect(args.recipients).toEqual(expectedRecipients);
-};
-
-const assertServerEventContent = (args: any, expectedMessage: string) => {
-	expect(args).toHaveProperty('message');
-	expect(args).toHaveProperty('timestamp');
-
-	expect(typeof args.message === 'string').toBe(true);
-	expect(typeof args.timestamp === 'string').toBe(true);
-
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-	expect(Date.parse(args.timestamp) / 1000).toBeCloseTo(new Date().getTime() / 1000, 0);
-
-	expect((args.message as string)).toBe(expectedMessage);
-};
-
-const resetDatabase = async () => {
-	await ChatMessage.delete({});
-	await User.delete({});
-};
+import {SocketEvent} from '../utils/types';
+import {assertMessageContent, assertServerEventContent, createUser, resetDatabase, type UserInfo} from './test.helpers';
 
 describe('websocket events', () => {
 	let primaryClientSocket: ClientSocket;
 	let secondaryClientSocket: ClientSocket;
 	let httpServer: HttpServer;
+	let serverUrl: string;
 
 	let io: Server;
 
@@ -105,7 +43,7 @@ describe('websocket events', () => {
 
 		httpServer.listen(() => {
 			const {port} = httpServer.address() as AddressInfo;
-			const serverUrl = `http://localhost:${port}`;
+			serverUrl = `http://localhost:${port}`;
 
 			primaryClientSocket = clientIo(serverUrl, {auth: {token: primaryUser.token}});
 
@@ -124,8 +62,12 @@ describe('websocket events', () => {
 		httpServer.close();
 	});
 
-	afterAll(async () => {
-		await db.closeConnection();
+	afterAll(done => {
+		// Message storing is not awaited so it needs to be waited to finish
+		setTimeout(async () => {
+			await db.closeConnection();
+			done();
+		}, 500);
 	});
 
 	describe('message', () => {
@@ -253,6 +195,65 @@ describe('websocket events', () => {
 				expect(messages).toHaveLength(0);
 				done();
 			}, 500);
+		});
+	});
+
+	describe('users', () => {
+		type UsersEventContent = {connectedUsers: UserPublic[]};
+
+		it('should be sent when user joins', done => {
+			const userEventContents: UsersEventContent[] = [];
+
+			primaryClientSocket.on(SocketEvent.Users, (content: UsersEventContent) => {
+				userEventContents.push(content);
+			});
+
+			secondaryClientSocket.on('connect', () => {
+				setTimeout(() => {
+					const currentUsers = userEventContents.at(-1)?.connectedUsers;
+					expect(currentUsers).toHaveLength(2);
+					done();
+				}, 500);
+			});
+
+			secondaryClientSocket.connect();
+		});
+
+		it('should be sent when user leaves', done => {
+			const userEventContents: UsersEventContent[] = [];
+
+			primaryClientSocket.on(SocketEvent.Users, (content: UsersEventContent) => {
+				userEventContents.push(content);
+			});
+
+			secondaryClientSocket.on('connect', () => {
+				secondaryClientSocket.disconnect();
+				setTimeout(() => {
+					const currentUsers = userEventContents.at(-1)?.connectedUsers;
+					expect(currentUsers).toHaveLength(1);
+					done();
+				}, 500);
+			});
+
+			secondaryClientSocket.connect();
+		});
+
+		it('should send single user every time when same user connects (and disconnects) with multiple clients', done => {
+			secondaryClientSocket = clientIo(serverUrl, {auth: {token: primaryUser.token}, forceNew: true});
+
+			const userEvents: UsersEventContent[] = [];
+
+			primaryClientSocket.on(SocketEvent.Users, (content: UsersEventContent) => {
+				userEvents.push(content);
+			});
+
+			secondaryClientSocket.on('connect', () => {
+				secondaryClientSocket.disconnect();
+				setTimeout(() => {
+					expect(userEvents.map(c => c.connectedUsers).every(u => u.length === 1)).toBe(true); // In every message, there should be only one user online
+					done();
+				}, 500);
+			});
 		});
 	});
 });

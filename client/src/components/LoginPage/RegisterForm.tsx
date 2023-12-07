@@ -6,6 +6,7 @@ import {toast} from 'react-toastify';
 import axios from 'axios';
 import {type ExpectedAxiosErrorResponse} from '../../utils/types';
 import {Box} from '@mui/material';
+import toastifyConfig from '../../../toastify.config';
 
 const RegisterForm = () => {
 	const validationSchema = yup.object({
@@ -20,9 +21,8 @@ const RegisterForm = () => {
 			const user = await userService.createUser(values);
 			toast.update(toastId, {
 				render: `User "${user.username}" created successfully!`,
-				type: 'success',
-				isLoading: false,
-				autoClose: 5000,
+				type: toast.TYPE.SUCCESS,
+				...toastifyConfig,
 			});
 		} catch (ex) {
 			let message: string | undefined;
@@ -35,9 +35,8 @@ const RegisterForm = () => {
 
 			toast.update(toastId, {
 				render: message,
-				type: 'error',
-				isLoading: false,
-				autoClose: 5000,
+				type: toast.TYPE.ERROR,
+				...toastifyConfig,
 			});
 			console.error('creating user failed', ex);
 		} finally {

@@ -50,23 +50,35 @@ const getToken = async ({username, password}: UserCredentials): Promise<string> 
 	return token;
 };
 
-let onlineUsers: UserPublic[] = [];
+type UserConnection = {
+	connectionId: string;
+} & UserPublic;
 
-const getAllOnline = () => onlineUsers;
+let onlineUserConnections: UserConnection[] = [];
 
-const setOnline = (user: UserPublic) => {
-	onlineUsers
-		= onlineUsers.find(u => u.id === user.id) === undefined
-			? onlineUsers.concat(user)
-			: onlineUsers;
+const getAllOnline = () => {
+	const users = onlineUserConnections.map(({id, username}) => ({id, username}));
+
+	const distinctUserSet = new Set(users);
+
+	const distinctUsersArray = [...distinctUserSet];
+
+	return distinctUsersArray;
 };
 
-const setOffline = (user: UserPublic) => {
-	onlineUsers = onlineUsers.filter(u => u.id !== user.id);
+const setOnline = (user: UserConnection) => {
+	onlineUserConnections
+		= onlineUserConnections.find(u => u.id === user.id) === undefined
+			? onlineUserConnections.concat(user)
+			: onlineUserConnections;
+};
+
+const setOffline = (user: UserConnection) => {
+	onlineUserConnections = onlineUserConnections.filter(u => u.connectionId !== user.connectionId);
 };
 
 const clearAllOnlineUsers = () => {
-	onlineUsers = [];
+	onlineUserConnections = [];
 };
 
 const userService = {getAll, getSingle, create, getToken, getAllOnline, setOnline, setOffline, clearAllOnlineUsers};

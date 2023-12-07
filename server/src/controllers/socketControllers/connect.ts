@@ -19,7 +19,7 @@ const sendStoredMessages = async (socket: Socket, user: UserPublic) => {
 const connectHandler = async (io: Server, socket: Socket, user: UserPublic) => {
 	await socket.join(user.id);
 
-	userService.setOnline(user);
+	userService.setOnline({...user, connectionId: socket.id});
 	io.emit(SocketEvent.Users, {connectedUsers: userService.getAllOnline()});
 
 	logger.log(`socket ${socket.id} connected as user ${user.username}`);

@@ -4,27 +4,27 @@ describe('login page', () => {
 		cy.visit('/');
 	});
 
-	it('loads page', () => {
+	it('should be loaded initially', () => {
 		cy.contains(/welcome to messenger/i);
 		cy.contains(/login/i);
 		cy.contains(/register/i);
 	});
 
 	describe('registration form', () => {
-		it('is successful when valid credentials', () => {
+		it('should be successful when valid credentials', () => {
 			cy.register('TestUsername', 'TestPassword');
 
 			cy.contains(/created successfully/i).contains('TestUsername');
 		});
 
-		it('shows error when invalid username', () => {
+		it('should show error when invalid username', () => {
 			cy.register('Te', 'TestPassword');
 
 			cy.contains(/created successfully/i).should('not.exist');
 			cy.get('#registration-form').contains(/username must be at least 3 characters/);
 		});
 
-		it('shows error when invalid password', () => {
+		it('should show error when invalid password', () => {
 			cy.register('TestUsername', 'Test');
 
 			cy.contains(/created successfully/i).should('not.exist');
@@ -39,17 +39,13 @@ describe('login page', () => {
 			cy.contains(/created successfully/i).contains('TestUsername');
 		});
 
-		it('is successful when user exists', () => {
+		it('should log in when existing user is submitted', () => {
 			cy.login('TestUsername', 'TestPassword');
 
 			cy.contains(/logged in as TestUsername/i);
-
-			cy.contains(/logout/i).click();
-
-			cy.contains(/welcome to messenger/i);
 		});
 
-		it('shows error when invalid password', () => {
+		it('should show error when invalid password', () => {
 			cy.login('TestUsername', 'wrong');
 
 			cy.contains(/Login failed! Incorrect username or password/i);

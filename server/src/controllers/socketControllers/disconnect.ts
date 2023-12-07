@@ -13,7 +13,7 @@ const disconnectHandler = (io: Server, socket: Socket, user: UserPublic) => {
 			{message: `${user.username} left the chat`, timestamp: new Date()},
 		);
 
-		userService.setOffline(user);
+		userService.setOffline({...user, connectionId: socket.id});
 		io.emit(SocketEvent.Users, {connectedUsers: userService.getAllOnline()});
 	});
 };
