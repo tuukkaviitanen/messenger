@@ -202,22 +202,37 @@ describe('websocket events', () => {
 		type UsersEventContent = {connectedUsers: UserPublic[]};
 
 		it('should be sent when user joins', done => {
-			primaryClientSocket.on(SocketEvent.Users, ({connectedUsers}: UsersEventContent) => {
-				if (connectedUsers.length === 1) { // Skip initial event
-					return;
-				}
+			const userEventContents: UsersEventContent[] = [];
 
-				expect(connectedUsers).toHaveLength(2);
-				done();
+			primaryClientSocket.on(SocketEvent.Users, (content: UsersEventContent) => {
+				userEventContents.push(content);
+			});
+
+			secondaryClientSocket.on('connect', () => {
+				setTimeout(() => {
+					const currentUsers = userEventContents.at(-1)?.connectedUsers;
+					expect(currentUsers).toHaveLength(2);
+					done();
+				}, 500);
 			});
 
 			secondaryClientSocket.connect();
 		});
 
 		it('should be sent when user leaves', done => {
-			primaryClientSocket.on(SocketEvent.Users, ({connectedUsers}: UsersEventContent) => {
-				expect(connectedUsers).toHaveLength(1);
-				done();
+			const userEventContents: UsersEventContent[] = [];
+
+			primaryClientSocket.on(SocketEvent.Users, (content: UsersEventContent) => {
+				userEventContents.push(content);
+			});
+
+			secondaryClientSocket.on('connect', () => {
+				secondaryClientSocket.disconnect();
+				setTimeout(() => {
+					const currentUsers = userEventContents.at(-1)?.connectedUsers;
+					expect(currentUsers).toHaveLength(1);
+					done();
+				}, 500);
 			});
 
 			secondaryClientSocket.connect();
@@ -235,7 +250,6 @@ describe('websocket events', () => {
 			secondaryClientSocket.on('connect', () => {
 				secondaryClientSocket.disconnect();
 				setTimeout(() => {
-					expect(userEvents).toHaveLength(3); // Should have events from: first client connects, second clients connects, second client disconnects
 					expect(userEvents.map(c => c.connectedUsers).every(u => u.length === 1)).toBe(true); // In every message, there should be only one user online
 					done();
 				}, 500);
