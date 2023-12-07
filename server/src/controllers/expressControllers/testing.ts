@@ -22,7 +22,7 @@ testingRouter.post('/setUserOnline', async (req, res) => {
 
 	const user = userPublicSchema.parse(req.body);
 
-	userService.setOnline(user);
+	userService.setOnline({...user, connectionId: 'mock-socket-id'});
 	return res.sendStatus(204);
 });
 
