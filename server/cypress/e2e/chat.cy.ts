@@ -52,5 +52,33 @@ describe('chat page', () => {
 
 			cy.contains(/Good bye global chat!/);
 		});
+
+		it('should restore private chats on login', () => {
+			cy.get('#users-container').contains('initial-user').click();
+			cy.sendChat('This chat should be saved!');
+
+			cy.contains(/logout/i).click();
+			cy.login('TestUser', 'TestPassword');
+			cy.get('#chats-container').contains('initial-user').click();
+
+			cy.contains('This chat should be saved!');
+		});
+
+		it('should NOT restore private chats when other user logs in', () => {
+			cy.get('#users-container').contains('initial-user').click();
+			cy.sendChat('This chat should be saved!');
+
+			cy.contains(/logout/i).click();
+			cy.register('OtherUser', 'OtherPassword');
+
+			cy.contains(/created successfully/i).click();
+
+			cy.login('OtherUser', 'OtherPassword');
+			cy.get('#chats-container').contains('initial-user').should('not.exist');
+
+			cy.get('#users-container').contains('initial-user').click();
+
+			cy.contains('This chat should be saved!').should('not.exist');
+		});
 	});
 });
