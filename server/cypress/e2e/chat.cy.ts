@@ -16,7 +16,13 @@ describe('chat page', () => {
 			});
 		});
 
-		it('sending message at start shows message in global chat', () => {
+		it('should return to login when logout is clicked', () => {
+			cy.contains(/logout/i).click();
+
+			cy.contains(/welcome to messenger/i);
+		});
+
+		it('should show message in global chat when sending message', () => {
 			cy.sendChat('This is a test message!');
 			cy.sendChat('This is a second test message!');
 
@@ -24,7 +30,7 @@ describe('chat page', () => {
 			cy.contains(/This is a second test message!/);
 		});
 
-		it('clicking user opens a new separate chat with that user', () => {
+		it('should open a new separate chat when clicking on a user', () => {
 			cy.sendChat('Good bye global chat!');
 
 			cy.get('#users-container').contains('initial-user').click();
