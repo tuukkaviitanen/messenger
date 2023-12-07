@@ -1,17 +1,12 @@
 import supertest from 'supertest';
-import {app} from '../server';
 import {expect, describe, it, beforeAll, beforeEach, afterAll} from '@jest/globals';
 
+import {app} from '../server';
 import {User} from '../entities/User';
 import db from '../utils/db';
-import {ChatMessage} from '../entities/ChatMessage';
+import {resetDatabase} from './test.helpers';
 
 const api = supertest(app);
-
-const resetDatabase = async () => {
-	await ChatMessage.delete({});
-	await User.delete({});
-};
 
 beforeAll(async () => {
 	await db.createConnection();
