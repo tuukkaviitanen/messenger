@@ -6,6 +6,16 @@ const styles: StyleSheet = {
 		py: 1,
 		px: 2,
 	},
+	sender: {
+		fontWeight: 500,
+	},
+	messageContent: {
+		wordBreak: 'break-word',
+	},
+	timestamp: {
+		fontSize: 12,
+		float: 'right',
+	},
 };
 
 type Params = {
@@ -15,21 +25,23 @@ type Params = {
 const ChatMessage = ({message}: Params) => {
 	const today = new Date().setHours(0, 0, 0, 0);
 	const isSentToday = today === new Date(message.timestamp).setHours(0, 0, 0, 0);
+	const isSentThisYear = new Date(today).getFullYear() === message.timestamp.getFullYear();
 
 	const onlyTimeOptions: Intl.DateTimeFormatOptions = {hour: '2-digit', minute: '2-digit'};
-	const fullDateOptions: Intl.DateTimeFormatOptions = {hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short'};
+	const dateOptions: Intl.DateTimeFormatOptions = {...onlyTimeOptions, day: '2-digit', month: 'short'};
+	const fullDateOptions: Intl.DateTimeFormatOptions = {...dateOptions, year: 'numeric'};
 
-	const timeString = message.timestamp.toLocaleTimeString([], isSentToday ? onlyTimeOptions : fullDateOptions);
+	const timeString = message.timestamp.toLocaleTimeString([], isSentToday ? onlyTimeOptions : isSentThisYear ? dateOptions : fullDateOptions);
 
 	return (
 		<Paper sx={styles.container}>
-			<Typography variant='subtitle2'>
+			<Typography sx={styles.sender}>
 				{message.sender}
 			</Typography>
-			<Typography>
+			<Typography sx={styles.messageContent}>
 				{message.message}
 			</Typography>
-			<Typography sx={{p: 0}} variant='overline'>Sent {timeString}</Typography>
+			<Typography sx={styles.timestamp}>Sent {timeString}</Typography>
 		</Paper>
 
 	);
