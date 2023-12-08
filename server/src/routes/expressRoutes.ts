@@ -16,10 +16,12 @@ const expressRouter = createRouter();
 
 expressRouter.use(helmet());
 
-expressRouter.use(rateLimit({
-	windowMs: 15 * 60 * 1000, // 15 minutes in milliseconds
-	max: 100, // Max number of requests allowed in that time frame
-}));
+if (config.nodeEnv === 'production') {
+	expressRouter.use(rateLimit({
+		windowMs: 15 * 60 * 1000, // 15 minutes in milliseconds
+		max: 100, // Max number of requests allowed in that time frame
+	}));
+}
 
 expressRouter.use(express.json());
 
