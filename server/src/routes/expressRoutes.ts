@@ -7,10 +7,14 @@ import path from 'path';
 import config from '../utils/config';
 import testingRouter from '../controllers/expressControllers/testing';
 import logger from '../utils/logger';
+import helmet from 'helmet';
 
 const clientDistPath = config.nodeEnv === 'development' ? '../../../client/dist' : '../../../../client/dist';
 
 const expressRouter = createRouter();
+
+expressRouter.use(helmet());
+
 expressRouter.use(express.json());
 
 expressRouter.use(parseToken);

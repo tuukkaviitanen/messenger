@@ -5,9 +5,12 @@ import {SocketEvent, type SocketWithUser} from '../utils/types';
 import messageHandler from '../controllers/socketControllers/message';
 import disconnectHandler from '../controllers/socketControllers/disconnect';
 import connectHandler from '../controllers/socketControllers/connect';
+import helmet from 'helmet';
 
 export const attachSocketServerTo = (httpServer: HttpServer) => {
 	const io = new Server(httpServer);
+
+	io.engine.use(helmet());
 
 	io.use(tokenParserMiddleware);
 
