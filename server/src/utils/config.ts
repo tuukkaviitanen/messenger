@@ -14,11 +14,13 @@ const postgresUrl = (nodeEnv === 'test') ? postgresUrlTesting : postgresUrlProdu
 
 const secret = process.env.SECRET;
 
-if (!postgresUrl || !nodeEnv || !secret) {
+const redisUrl = process.env.REDIS_URL;
+
+if (!postgresUrl || !nodeEnv || !secret || !redisUrl) {
 	logger.error('All required env variables are not set!');
 	process.exit(1);
 }
 
-const config = {port, postgresUrl, nodeEnv, secret};
+const config = {port, postgresUrl, nodeEnv, secret, redisUrl};
 
 export default config;
