@@ -44,12 +44,16 @@ const Chat = () => {
 
 	const {messages} = chat;
 
+	const sortedMessages = [...messages].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+
 	const socket = useAppSelector(state => state.socket.connection);
 
 	// eslint-disable-next-line @typescript-eslint/ban-types
 	const setRef = useCallback((node: HTMLElement | null) => {
 		if (node) {
-			node.scrollIntoView({behavior: 'smooth'});
+			setTimeout(() => {
+				node.scrollIntoView({behavior: 'smooth'});
+			}, 100); // Slight delay to let messages load
 		}
 	}, []);
 
@@ -94,7 +98,7 @@ const Chat = () => {
 			socket?.off(SocketEvent.ServerEvent);
 			socket?.off(SocketEvent.RestoreMessages);
 		};
-	}, [socket, messages, dispatch, logoutUser]);
+	}, [socket, dispatch, logoutUser]);
 
 	const handleSendMessage: OnSubmit = ({messageField}, {resetForm}) => {
 		socket?.emit(SocketEvent.Message, {message: messageField, recipients: chat.recipients});
@@ -104,8 +108,8 @@ const Chat = () => {
 	return (
 		<Box sx={styles.container}>
 			<Box sx={styles.chatArea}>
-				{messages.map((m, index) => {
-					const lastMessage = messages.length - 1 === index;
+				{sortedMessages.map((m, index) => {
+					const lastMessage = sortedMessages.length - 1 === index;
 					return (
 						<ListItem
 							ref={lastMessage ? setRef : null}
