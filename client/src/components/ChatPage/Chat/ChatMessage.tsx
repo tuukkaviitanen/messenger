@@ -13,7 +13,13 @@ type Params = {
 };
 
 const ChatMessage = ({message}: Params) => {
-	const timeString = message.timestamp.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+	const today = new Date().setHours(0, 0, 0, 0);
+	const isSentToday = today === new Date(message.timestamp).setHours(0, 0, 0, 0);
+
+	const onlyTimeOptions: Intl.DateTimeFormatOptions = {hour: '2-digit', minute: '2-digit'};
+	const fullDateOptions: Intl.DateTimeFormatOptions = {hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short'};
+
+	const timeString = message.timestamp.toLocaleTimeString([], isSentToday ? onlyTimeOptions : fullDateOptions);
 
 	return (
 		<Paper sx={styles.container}>
