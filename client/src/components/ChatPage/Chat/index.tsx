@@ -92,11 +92,18 @@ const Chat = () => {
 			});
 		});
 
+		socket?.on(SocketEvent.RestoreEvents, ({events}: {events: ServerEventContent[]}) => {
+			events.forEach(({message, timestamp}) => {
+				dispatch(addMessage({message: {message, sender: 'server', timestamp: new Date(timestamp)}}));
+			});
+		});
+
 		return () => {
 			socket?.off(SocketEvent.Message);
 			socket?.off(SocketEvent.ConnectionError);
 			socket?.off(SocketEvent.ServerEvent);
 			socket?.off(SocketEvent.RestoreMessages);
+			socket?.off(SocketEvent.RestoreEvents);
 		};
 	}, [socket, dispatch, logoutUser]);
 
