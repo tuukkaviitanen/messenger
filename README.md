@@ -11,7 +11,7 @@ Running as a free tier service so it might take some time to start up.
 
 Node server has a [REST API](https://www.ibm.com/topics/rest-apis) using [Express](https://expressjs.com/) and WebSockets server using [Socket.io](https://socket.io/).
 
-Users are validated and stored in a [PostgreSQL](https://www.postgresql.org/) database through [TypeORM](https://typeorm.io/).
+Users are validated and stored in a [PostgreSQL](https://www.postgresql.org/) database through [TypeORM](https://typeorm.io/). Encrypted private messages are also stored in the postgres database, while global chat is stored in a [Redis](https://redis.io/) database for one hour.
 
 REST API is used for user management and WebSockets are used to transport messages between users real-time.
 
