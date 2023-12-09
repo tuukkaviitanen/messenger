@@ -12,6 +12,8 @@ describe('chat page', () => {
 				cy.request('POST', '/api/testing/setUserOnline', user);
 				cy.visit('/');
 				cy.register('TestUser', 'TestPassword');
+				cy.contains(/created successfully/i);
+
 				cy.login('TestUser', 'TestPassword');
 				cy.contains(/Welcome to the messenger app/i); // Waits for socket connection
 			});

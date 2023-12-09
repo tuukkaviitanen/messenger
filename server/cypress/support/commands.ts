@@ -43,14 +43,12 @@ Cypress.Commands.add('register', (username: string, password: string) => {
 	cy.get('#registration-form').find('input:first').type(username);
 	cy.get('#registration-form').find('input:last').type(password);
 	cy.get('#registration-form').find('button').click();
-	cy.contains(/created successfully/i);
 });
 
 Cypress.Commands.add('login', (username: string, password: string) => {
 	cy.get('#login-form').find('input:first').type(username);
 	cy.get('#login-form').find('input:last').type(password);
 	cy.get('#login-form').find('button').click();
-	cy.contains(/logged in/i);
 });
 
 Cypress.Commands.add('sendChat', (message: string) => {
