@@ -3,7 +3,7 @@ import {type UserPublic} from '../../validators/UserPublic';
 import userService from '../../services/userService';
 import logger from '../../utils/logger';
 import {SocketEvent} from '../../utils/types';
-import {sendStoredMessages} from './socket.helpers';
+import {saveEventToCache, sendStoredEvents, sendStoredMessages} from './socket.helpers';
 
 const connectHandler = async (io: Server, socket: Socket, user: UserPublic) => {
 	await socket.join(user.id);
@@ -13,10 +13,12 @@ const connectHandler = async (io: Server, socket: Socket, user: UserPublic) => {
 
 	logger.log(`socket ${socket.id} connected as user ${user.username}`);
 
-	socket.broadcast.emit(SocketEvent.ServerEvent, {
-		message: `${user.username} joined the chat`,
-		timestamp: new Date(),
-	});
+	const globalEvent = {message: `${user.username} joined the chat`, timestamp: new Date()};
+
+	socket.broadcast.emit(SocketEvent.ServerEvent, globalEvent);
+
+	// Awaiting database calls will block the event from finishing
+	void saveEventToCache(socket, globalEvent);
 
 	socket.emit(SocketEvent.ServerEvent, {
 		message: `Welcome to the messenger app. Users currently online: ${userService
@@ -28,6 +30,7 @@ const connectHandler = async (io: Server, socket: Socket, user: UserPublic) => {
 
 	// Awaiting database calls will block the event from finishing
 	void sendStoredMessages(socket, user);
+	void sendStoredEvents(socket);
 };
 
 export default connectHandler;
