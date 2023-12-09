@@ -67,11 +67,21 @@ E2E tests are important for the CI/CD pipeline. Finishing these tests successful
 
 Backend runs an express server with `/api/users` and `/api/login` endpoints. Users can be created and single users can be fetched with id. Passwords are hashed before storage. Login returns a [JsonWebToken](https://jwt.io/) that can be used for authentication in following requests.
 
-## Database
+## Databases
 
-Users and Messages are stored in a [PostgreSQL](https://www.postgresql.org/) database through [TypeORM](https://typeorm.io/).
+### PostgreSQL
+
+Users and private messages are stored in a [PostgreSQL](https://www.postgresql.org/) database through [TypeORM](https://typeorm.io/).
 
 Database schema is updated with migrations. Migrations are generated with [TypeORM CLI](https://orkhan.gitbook.io/typeorm/docs/using-cli). Migrations run at server startup or manually. Tests also run migrations, so broken migrations won't get through the CI/CD pipeline.
+
+### Redis
+
+Global messages and server events (such as user joined) are stored in a [Redis](https://redis.io/) database. Redis is a key-value database that stores data in-memory (by default) so everything can be accessed fast and easily. Data stored in-memory also disappears when the server is closed.
+
+Global messages and events are not using complex relations, and there is no need to store them persistently. On the contrary, I would prefer to store them for only about an hour to not bloat the front page or the database. I thought this would be a great chance to learn more about Redis.
+
+Messages and events are stored in a list structure. Unfortunately, each list element can't be assigned it's own [TTL](https://redis.io/commands/ttl/) (Time-To-Live), so the whole list is cleared after an hour of no new updates. This is fine when there is not an around-the-clock active user base, but should find a better option for larger scale. Each message could be stored as it's own key (and TTL), but the speed and efficiency of this should be tested more.
 
 ### Encryption
 
@@ -105,13 +115,11 @@ Frontend is built with [React](https://react.dev/) and styled with [Material UI]
 
 ## Planned
 
-- Store global chat on server for an hour
-   - Maybe using [Redis](https://redis.io/)?
+- Component tests to frontend
 - Group chats to frontend
    - Functionality already exists on the server
 - Full CRUD-actions to users in API
 - Containerizing the whole application using [Docker](https://www.docker.com/)
-- Component tests to frontend?
 
 ## Setup
 
@@ -129,8 +137,9 @@ The production version is running version 20.9.0.
 1. Change to `/server` directory
 2. Run `npm install`
 3. Create `.env` file with required env variables
-   a. Check out `.env.template` for reference
-   b. This requires setting up a PostgreSQL database. You can use easily set up a docker container with instructions [here](https://stackoverflow.com/questions/37694987/connecting-to-postgresql-in-a-docker-container-from-outside) (this of course requires setting up Docker first)
+   a. Check out `.env.template` for instructions or copy the contents of `.env.dev` that are configured to be used with `docker-compose.dev.yml`.
+   b. This requires setting up PostgreSQL and Redis databases. This can be done easily with `docker-compose.dev.yml` in the root directory. This requires Docker.
+   c. NOTE: Use separate databases and your own secret for production.
 4. For the server to serve the client, client project needs to be built. Look for setup instructions below.
 5. Now you can run the application with following commands:
    a. Run `npm run dev` for development with automatic reloading on save.
@@ -159,7 +168,7 @@ Existing migrations also have to be run before generating new migrations.
 
 ### Backend
 
-Endpoints:
+Express API endpoints:
 
 These URLs work when running locally and port is left to default (3000)
 
@@ -171,7 +180,7 @@ REQUEST BODY { "username": "username", "password": "password"}
 Get single user:
 GET http://localhost:3000/api/users/:id
 
-Login (get JTW):
+Login (get token):
 POST http://localhost:3000/api/login
 REQUEST BODY { "username": "username", "password": "password"}
 ```
@@ -180,7 +189,7 @@ REQUEST BODY { "username": "username", "password": "password"}
 
 Client can be accessed in the localhost port that is printed to console after running the application. e.g. http://localhost:3000.
 
-When running frontend separately in dev mode, client should be accessed in a separate URL that is printed to frontend console.
+When running frontend separately in dev mode, client should be accessed in a separate URL that is printed to frontend dev server console.
 
 When running only the server, client can be accessed at the root path of the server URL.
 
