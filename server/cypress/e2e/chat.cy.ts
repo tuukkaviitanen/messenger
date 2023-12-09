@@ -12,7 +12,10 @@ describe('chat page', () => {
 				cy.request('POST', '/api/testing/setUserOnline', user);
 				cy.visit('/');
 				cy.register('TestUser', 'TestPassword');
+				cy.contains(/created successfully/i);
+
 				cy.login('TestUser', 'TestPassword');
+				cy.contains(/Welcome to the messenger app/i); // Waits for socket connection
 			});
 		});
 
@@ -58,6 +61,9 @@ describe('chat page', () => {
 			cy.sendChat('This chat should be saved!');
 
 			cy.contains(/logout/i).click();
+
+			cy.reload(true);
+
 			cy.login('TestUser', 'TestPassword');
 			cy.get('#chats-container').contains('initial-user').click();
 
@@ -69,6 +75,9 @@ describe('chat page', () => {
 			cy.sendChat('This chat should be saved!');
 
 			cy.contains(/logout/i).click();
+
+			cy.reload(true);
+
 			cy.register('OtherUser', 'OtherPassword');
 
 			cy.contains(/created successfully/i).click();
@@ -79,6 +88,24 @@ describe('chat page', () => {
 			cy.get('#users-container').contains('initial-user').click();
 
 			cy.contains('This chat should be saved!').should('not.exist');
+		});
+
+		it('should restore global chat when page is refreshed', () => {
+			cy.sendChat('This global chat should be saved to cache!');
+
+			cy.contains(/logout/i).click();
+
+			cy.reload();
+
+			cy.login('TestUser', 'TestPassword');
+
+			cy.contains('This global chat should be saved to cache!');
+		});
+
+		it('should restore global chat events when page is refreshed', () => {
+			cy.reload();
+
+			cy.contains('TestUser left the chat');
 		});
 	});
 });

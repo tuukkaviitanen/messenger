@@ -4,6 +4,7 @@ import {userPublicSchema} from '../../validators/UserPublic';
 import userService from '../../services/userService';
 import {ChatMessage} from '../../entities/ChatMessage';
 import logger from '../../utils/logger';
+import redis from '../../utils/redis';
 
 const testingRouter = createRouter();
 
@@ -14,6 +15,9 @@ testingRouter.delete('/clearDatabase', async (req, res) => {
 
 	await ChatMessage.delete({});
 	await User.delete({});
+
+	await redis.clear();
+
 	return res.sendStatus(204);
 });
 

@@ -25,11 +25,5 @@ export enum SocketEvent {
 	ServerEvent = 'server-event',
 	Error = 'error',
 	RestoreMessages = 'restore-messages',
+	RestoreEvents = 'restore-events',
 }
-
-export type MessageContent = {
-	sender: string;
-	message: string;
-	recipients?: UserPublic[];
-	timestamp: Date;
-};

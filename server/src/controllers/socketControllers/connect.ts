@@ -3,18 +3,7 @@ import {type UserPublic} from '../../validators/UserPublic';
 import userService from '../../services/userService';
 import logger from '../../utils/logger';
 import {SocketEvent} from '../../utils/types';
-import messageService from '../../services/messageService';
-
-const sendStoredMessages = async (socket: Socket, user: UserPublic) => {
-	try {
-		const messages = await messageService.getAllByUser(user.id);
-		socket.emit(SocketEvent.RestoreMessages, {
-			messages,
-		});
-	} catch (error) {
-		logger.error('Error getting messages!', error);
-	}
-};
+import {saveEventToCache, sendStoredEvents, sendStoredMessages} from './socket.helpers';
 
 const connectHandler = async (io: Server, socket: Socket, user: UserPublic) => {
 	await socket.join(user.id);
@@ -24,10 +13,13 @@ const connectHandler = async (io: Server, socket: Socket, user: UserPublic) => {
 
 	logger.log(`socket ${socket.id} connected as user ${user.username}`);
 
-	socket.broadcast.emit(SocketEvent.ServerEvent, {
-		message: `${user.username} joined the chat`,
-		timestamp: new Date(),
-	});
+	const globalEvent = {message: `${user.username} joined the chat`, timestamp: new Date()};
+
+	socket.broadcast.emit(SocketEvent.ServerEvent, globalEvent);
+
+	// Awaiting database calls will block the event from finishing
+	void saveEventToCache(socket, globalEvent);
+
 	socket.emit(SocketEvent.ServerEvent, {
 		message: `Welcome to the messenger app. Users currently online: ${userService
 			.getAllOnline()
@@ -38,6 +30,7 @@ const connectHandler = async (io: Server, socket: Socket, user: UserPublic) => {
 
 	// Awaiting database calls will block the event from finishing
 	void sendStoredMessages(socket, user);
+	void sendStoredEvents(socket);
 };
 
 export default connectHandler;

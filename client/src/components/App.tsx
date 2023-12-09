@@ -3,7 +3,7 @@ import LoginPage from './LoginPage';
 import {Container} from '@mui/material';
 import ChatPage from './ChatPage';
 
-import {ToastContainer} from 'react-toastify';
+import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {useAppSelector} from '../hooks/typedReduxHooks';
 import {localStorageKeys} from '../utils/constants';
@@ -35,7 +35,10 @@ const App = () => {
 		const user = userWithTokenSchema.safeParse(JSON.parse(localStorageUser));
 
 		if (!user.success) {
-			console.error('Parsed user invalid');
+			toast.error('Saved user invalid');
+			window.localStorage.removeItem(
+				localStorageKeys.currentUser,
+			);
 			return;
 		}
 

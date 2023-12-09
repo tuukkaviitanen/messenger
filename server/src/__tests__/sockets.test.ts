@@ -13,6 +13,7 @@ import {type UserPublic} from '../validators/UserPublic';
 import db from '../utils/db';
 import {SocketEvent} from '../utils/types';
 import {assertMessageContent, assertServerEventContent, createUser, resetDatabase, type UserInfo} from './test.helpers';
+import redis from '../utils/redis';
 
 describe('websocket events', () => {
 	let primaryClientSocket: ClientSocket;
@@ -30,11 +31,17 @@ describe('websocket events', () => {
 		await db.createConnection();
 		await resetDatabase();
 
+		await redis.createConnection();
+
 		const api = supertest(app);
 
 		await createUser(api, primaryUser);
 		await createUser(api, secondaryUser);
 		await createUser(api, passiveUser);
+	});
+
+	beforeEach(async () => {
+		await redis.clear();
 	});
 
 	beforeEach(done => {
@@ -66,6 +73,7 @@ describe('websocket events', () => {
 		// Message storing is not awaited so it needs to be waited to finish
 		setTimeout(async () => {
 			await db.closeConnection();
+			await redis.closeConnection();
 			done();
 		}, 500);
 	});
