@@ -41,7 +41,6 @@ const LoginForm = () => {
 				type: toast.TYPE.ERROR,
 				...toastifyConfig,
 			});
-			console.error('login failed', ex);
 		} finally {
 			resetForm();
 		}

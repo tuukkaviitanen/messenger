@@ -38,7 +38,6 @@ const RegisterForm = () => {
 				type: toast.TYPE.ERROR,
 				...toastifyConfig,
 			});
-			console.error('creating user failed', ex);
 		} finally {
 			resetForm();
 		}
