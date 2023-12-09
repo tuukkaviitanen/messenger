@@ -13,6 +13,7 @@ describe('chat page', () => {
 				cy.visit('/');
 				cy.register('TestUser', 'TestPassword');
 				cy.login('TestUser', 'TestPassword');
+				cy.contains(/Welcome to the messenger app/i); // Waits for socket connection
 			});
 		});
 
@@ -97,6 +98,12 @@ describe('chat page', () => {
 			cy.login('TestUser', 'TestPassword');
 
 			cy.contains('This global chat should be saved to cache!');
+		});
+
+		it('should restore global chat events when page is refreshed', () => {
+			cy.reload();
+
+			cy.contains('TestUser left the chat');
 		});
 	});
 });
