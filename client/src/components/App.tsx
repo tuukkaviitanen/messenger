@@ -15,7 +15,7 @@ import toastifyConfig from '../../toastify.config';
 
 const styles: StyleSheet = {
 	container: {
-		height: '100vh',
+		height: '100dvh',
 	},
 };
 
