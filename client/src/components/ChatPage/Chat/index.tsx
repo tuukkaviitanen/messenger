@@ -71,6 +71,13 @@ const Chat = () => {
 
 	useEffect(() => {
 		socket?.on(
+			SocketEvent.Connection,
+			() => {
+				dispatch(clearChats());
+			},
+		);
+
+		socket?.on(
 			SocketEvent.Message,
 			({sender, message, timestamp, recipients}: MessageContent) => {
 				dispatch(addMessage({message: {message, sender, timestamp: new Date(timestamp)}, recipients}));
@@ -87,8 +94,6 @@ const Chat = () => {
 		});
 
 		socket?.on(SocketEvent.RestoreMessages, ({messages}: {messages: MessageContent[]}) => {
-			dispatch(clearChats());
-
 			messages.forEach(({sender, message, timestamp, recipients}: MessageContent) => {
 				dispatch(addMessage({message: {message, sender, timestamp: new Date(timestamp)}, recipients}));
 			});

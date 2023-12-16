@@ -29,6 +29,7 @@ export enum SocketEvent {
 	ServerEvent = 'server-event',
 	RestoreMessages = 'restore-messages',
 	RestoreEvents = 'restore-events',
+	Connection = 'connection',
 }
 
 export type Chat = {
