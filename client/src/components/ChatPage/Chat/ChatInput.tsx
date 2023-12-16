@@ -1,7 +1,9 @@
-import {Button, Paper, TextField} from '@mui/material';
+import {Button, Paper, TextField, ToggleButton} from '@mui/material';
 import {useFormik} from 'formik';
 import {type StyleSheet} from '../../../utils/types';
 import * as yup from 'yup';
+import {useState} from 'react';
+import FormatAlignLeftIcon from '@mui/icons-material/FormatAlignLeft';
 
 type InitialValues = {
 	messageField: string;
@@ -28,6 +30,7 @@ const styles: StyleSheet = {
 
 const ChatInput = ({handleSendMessage}: Params) => {
 	const initialValues: InitialValues = {messageField: ''};
+	const [multilineEnabled, setMultilineEnabled] = useState(false);
 
 	const validationSchema = yup.object({
 		messageField: yup.string().required(),
@@ -42,12 +45,22 @@ const ChatInput = ({handleSendMessage}: Params) => {
 	return (
 		<form onSubmit={formik.handleSubmit}>
 			<Paper id='chat-form' elevation={10} sx={styles.container}>
+				<ToggleButton
+					value='multiline'
+					selected={multilineEnabled}
+					onChange={() => {
+						setMultilineEnabled(!multilineEnabled);
+					}}>
+					<FormatAlignLeftIcon/>
+				</ToggleButton>
 				<TextField
 					sx={styles.textField}
 					value={formik.values.messageField}
 					onChange={formik.handleChange}
 					name='messageField'
 					type='text'
+					multiline={multilineEnabled}
+					maxRows={6}
 				/>
 				<Button type='submit' variant='contained'>
           Send

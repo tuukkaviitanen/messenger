@@ -11,6 +11,7 @@ const styles: StyleSheet = {
 	},
 	messageContent: {
 		wordBreak: 'break-word',
+		whiteSpace: 'break-spaces',
 	},
 	timestamp: {
 		fontSize: 12,
