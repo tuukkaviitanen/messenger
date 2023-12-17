@@ -18,7 +18,7 @@ type Params = {
 const styles: StyleSheet = {
 	container: {
 		display: 'flex',
-		flexDirection: 'row',
+		flexDirection: {xs: 'column', sm: 'row'},
 		justifyContent: 'space-evenly',
 		m: 1,
 		p: 1,
