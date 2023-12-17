@@ -107,5 +107,24 @@ describe('chat page', () => {
 
 			cy.contains('TestUser left the chat');
 		});
+
+		it('should not allow multiline messages when multiline button is toggled off', () => {
+			// Multiple clicks to make sure that toggling works
+			cy.get('#multiline-button').click();
+			cy.get('#multiline-button').click();
+
+			cy.sendChat('this\nis\na\nmultiline\nmessage');
+			cy.contains('this is a multiline message').should('not.exist');
+		});
+
+		it('should allow multiline messages when multiline button is toggled on', () => {
+			// Multiple clicks to make sure that toggling works
+			cy.get('#multiline-button').click();
+			cy.get('#multiline-button').click();
+			cy.get('#multiline-button').click();
+
+			cy.sendChat('this\nis\na\nmultiline\nmessage');
+			cy.contains('this is a multiline message').should('have.html', 'this\nis\na\nmultiline\nmessage');
+		});
 	});
 });

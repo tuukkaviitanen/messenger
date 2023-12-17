@@ -52,7 +52,7 @@ Cypress.Commands.add('login', (username: string, password: string) => {
 });
 
 Cypress.Commands.add('sendChat', (message: string) => {
-	cy.get('#chat-form').find('input').type(message);
+	cy.get('#chat-form').get('#input-field').type(message);
 	cy.contains(/send/i).click();
 });
 

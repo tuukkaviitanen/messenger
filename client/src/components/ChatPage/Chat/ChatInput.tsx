@@ -46,6 +46,7 @@ const ChatInput = ({handleSendMessage}: Params) => {
 		<form onSubmit={formik.handleSubmit}>
 			<Paper id='chat-form' elevation={10} sx={styles.container}>
 				<ToggleButton
+					id='multiline-button'
 					value='multiline'
 					selected={multilineEnabled}
 					onChange={() => {
@@ -54,6 +55,7 @@ const ChatInput = ({handleSendMessage}: Params) => {
 					<FormatAlignLeftIcon/>
 				</ToggleButton>
 				<TextField
+					id='input-field'
 					sx={styles.textField}
 					value={formik.values.messageField}
 					onChange={formik.handleChange}
