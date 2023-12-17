@@ -6,7 +6,7 @@ import {SocketEvent, type StyleSheet, type User} from '../../../utils/types';
 import {useCallback, useEffect} from 'react';
 import {useAppDispatch, useAppSelector} from '../../../hooks/typedReduxHooks';
 import ChatInput, {type OnSubmit} from './ChatInput';
-import {addMessage} from '../../../reducers/chatSlice';
+import {addMessage, clearChats} from '../../../reducers/chatSlice';
 import ChatMessage from './ChatMessage';
 import {useLogoutUser} from '../../../hooks/loginHooks';
 import {toast} from 'react-toastify';
@@ -70,6 +70,13 @@ const Chat = () => {
 	};
 
 	useEffect(() => {
+		socket?.on(
+			SocketEvent.Connection,
+			() => {
+				dispatch(clearChats());
+			},
+		);
+
 		socket?.on(
 			SocketEvent.Message,
 			({sender, message, timestamp, recipients}: MessageContent) => {
