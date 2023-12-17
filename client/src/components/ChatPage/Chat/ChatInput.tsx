@@ -1,4 +1,4 @@
-import {Button, Paper, TextField, ToggleButton} from '@mui/material';
+import {Button, Paper, TextField, ToggleButton, Tooltip} from '@mui/material';
 import {useFormik} from 'formik';
 import {type StyleSheet} from '../../../utils/types';
 import * as yup from 'yup';
@@ -45,15 +45,18 @@ const ChatInput = ({handleSendMessage}: Params) => {
 	return (
 		<form onSubmit={formik.handleSubmit}>
 			<Paper id='chat-form' elevation={10} sx={styles.container}>
-				<ToggleButton
-					id='multiline-button'
-					value='multiline'
-					selected={multilineEnabled}
-					onChange={() => {
-						setMultilineEnabled(!multilineEnabled);
-					}}>
-					<FormatAlignLeftIcon/>
-				</ToggleButton>
+				<Tooltip title='Toggle multiline'>
+					<ToggleButton
+						id='multiline-button'
+						value='multiline'
+						selected={multilineEnabled}
+						onChange={() => {
+							setMultilineEnabled(!multilineEnabled);
+						}}>
+						<FormatAlignLeftIcon/>
+					</ToggleButton>
+				</Tooltip>
+
 				<TextField
 					id='input-field'
 					sx={styles.textField}
