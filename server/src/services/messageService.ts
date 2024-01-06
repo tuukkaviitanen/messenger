@@ -43,17 +43,26 @@ const create = async (message: Message) => {
 const redisKey = 'messages';
 
 const cache = async (message: MessageContent) => {
-	await redis.client.multi()
-		.rPush(redisKey, JSON.stringify(message))
-		.expire(redisKey, 60 * 60) // 1 hour in seconds
-		.exec();
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	await redis.client.set(`${redisKey}:${message.timestamp.getTime()}`, JSON.stringify(message), {EX: 60 * 60}); // Set to expire in 1 hour
 };
 
 const getAllCached = async () => {
-	const messages = await redis.client.lRange(redisKey, 0, -1);
+	// eslint-disable-next-line @typescript-eslint/naming-convention
+	const {keys} = await redis.client.scan(0, {MATCH: `${redisKey}:*`, COUNT: 1000});
+
+	if (keys.length === 0) {
+		return [];
+	}
+
+	const messages = await redis.client.mGet(keys);
 
 	const parsedMessages = messages
 		.map(unparsedMessage => {
+			if (!unparsedMessage) {
+				return null;
+			}
+
 			const parseResults = messageContentStringTimestampSchema.safeParse(JSON.parse(unparsedMessage));
 
 			return parseResults.success ? parseResults.data : null;
