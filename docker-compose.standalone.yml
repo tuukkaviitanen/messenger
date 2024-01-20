@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  app:
+    image: 'messenger'
+    build: .
+    ports:
+      - 3000:3000
+    environment:
+      PORT: 3000
+      POSTGRES_URL: postgres://postgres:postgres@postgres:5432/postgres
+      SECRET: sdfnwef80wejw8fjw489fjw48fjw4893f89w4g
+      REDIS_URL: redis://redis:6379
+
+  postgres:
+    image: 'postgres'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
+      interval: 3s
+      timeout: 60s
+      retries: 5
+      start_period: 30s
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+
+  redis:
+    image: 'redis'
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    ports:
+      - 6379:6379
