@@ -1,4 +1,4 @@
-FROM node:20-alpine as client-build-stage
+FROM node:20-bookworm-slim as client-build-stage
 
 WORKDIR /usr/src/app/client
 
@@ -10,7 +10,7 @@ COPY ./client/ ./
 
 RUN npm run build
 
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 
 WORKDIR /usr/src/app
 
