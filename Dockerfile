@@ -1,4 +1,4 @@
-FROM node:20.9.0 as client-build-stage
+FROM node:20-alpine as client-build-stage
 
 WORKDIR /usr/src/app/client
 
@@ -10,11 +10,11 @@ COPY ./client/ ./
 
 RUN npm run build
 
-FROM node:20.9.0
+FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-COPY --from=build-stage /usr/src/app/client/dist ./client/dist
+COPY --from=client-build-stage /usr/src/app/client/dist ./client/dist
 
 WORKDIR /usr/src/app/server
 
