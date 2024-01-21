@@ -1,0 +1,15 @@
+.git
+*Dockerfile*
+docker-compose*
+.github
+build.sh
+LICENSE
+README.md
+.node-version
+
+/*/.gitignore
+/*/.env*
+/*/cypress*
+/*/node_modules
+/*/build
+/*/dist
