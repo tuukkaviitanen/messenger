@@ -5,16 +5,27 @@
 LIVE ON RENDER: https://messenger-app-3ztg.onrender.com.
 Running as a free tier service so it might take some time to start up.
 
+Working hours for the Full Stack Project -course are in the `working_hours.md` file in the root of the repository.
+
 ## Summary
 
 Node server has a [REST API](https://www.ibm.com/topics/rest-apis) using [Express](https://expressjs.com/) and WebSockets server using [Socket.io](https://socket.io/).
 
-Users are validated and stored in a [PostgreSQL](https://www.postgresql.org/) database through [TypeORM](https://typeorm.io/). Encrypted private messages are also stored in the postgres database, while global chat is stored in a [Redis](https://redis.io/) database for one hour.
+Users are validated and stored in a [PostgreSQL](https://www.postgresql.org/) database through [TypeORM](https://typeorm.io/). Encrypted private messages are also stored in the postgres database, while global chat messages are stored in a [Redis](https://redis.io/) database for one hour.
 
 REST API is used for user management and WebSockets are used to transport messages between users real-time.
 
 Project is built with [TypeScript](https://www.typescriptlang.org/).
 [Zod](https://zod.dev/)-library is used to validate all inbound data at runtime as TypeScript types exist only until it is compiled into JavaScript. [ESLint](https://eslint.org/) is used to enforce coding-style and format. Both frontend and backend ESLint setups are based on [XO](https://github.com/xojs/xo) rule set.
+
+### User instructions
+
+New user can be created on the login page. Logging in with your user opens the global chatroom. There you can chat with everyone currently using the app. These messages are saved for one hour and then deleted.
+
+Online users are shown in the bottom right corner of the page. Another online user can be clicked to open a private chatroom with them. Existing chatrooms are shown on the right. Private messages are stored indefinitely.
+
+Multiline message field can be toggled on the bottom left corner for longer messages or ASCII art.
+
 
 ## Docker
 
@@ -237,4 +248,3 @@ When running frontend separately in dev mode, client should be accessed in a sep
 
 When running only the server, client can be accessed at the root path of the server URL.
 
-Users can be created on the login page and after logging in, user enters the chatroom automatically. Online users can be clicked to open a private chat with them.
