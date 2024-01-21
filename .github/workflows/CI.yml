@@ -185,3 +185,20 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag_release.outputs.version }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           push: true
+
+  container_deployment:
+    needs: [publish_docker_image]
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'push' }}
+    steps:
+      - name: Deploy to Render
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_CONTAINER_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
+      - name: Wait for Render Deployment
+        uses: bounceapp/render-action@0.7.1
+        with:
+          render-token: ${{ secrets.RENDER_API_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          service-id: ${{ secrets.RENDER_CONTAINER_SERVICE_ID }}
