@@ -2,8 +2,6 @@
 
 > Full Stack chat application using Node backend and React frontend. Currently includes a global chatroom and private chats.
 
-<b>IN PROGRESS</b>
-
 LIVE ON RENDER: https://messenger-app-3ztg.onrender.com.
 Running as a free tier service so it might take some time to start up.
 
@@ -18,11 +16,47 @@ REST API is used for user management and WebSockets are used to transport messag
 Project is built with [TypeScript](https://www.typescriptlang.org/).
 [Zod](https://zod.dev/)-library is used to validate all inbound data at runtime as TypeScript types exist only until it is compiled into JavaScript. [ESLint](https://eslint.org/) is used to enforce coding-style and format. Both frontend and backend ESLint setups are based on [XO](https://github.com/xojs/xo) rule set.
 
+## Docker
+
+This application can be fully containerized. A [Docker](https://www.docker.com/) image is created on every release. They are stored in the [GitHub Container Registry (ghcr.io)](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry). These images can be found in this repository under `Packages`. Images are tagged with the same release version number as the commit. Latest version is also tagged with the `latest` tag.
+
+### Dockerfile
+
+The Dockerfile used in this application is using a multi-stage build. This means that the application is built in the first stage, and just the final builds are copied to the final stage. Build-stage is not included in the image.
+
+From the frontend, only the dist directory is carried to the final image. From the backend, only the compiled JavaScript files and the production dependencies are carried over. No tests, no TypeScript, and no development dependencies. This reduces the image size to a fraction of what it would be.
+
+The dockerfile is also using a optimized [base Node image](https://hub.docker.com/_/node/). I chose 20-bookworm-slim. The alpine-version is the smallest, but is using an unofficial Node version and has some other disadvantages. ([Read more about the differences](https://snyk.io/blog/choosing-the-best-node-js-docker-image/))
+
+
+
+### Image usage
+
+Running this image requires the same environment variables as the app would normally need. This is the template setup that is used in the `docker-compose.standalone.yml`. <b>Don't use the same secret</b>.
+```
+PORT: 3000
+POSTGRES_URL: postgres://postgres:postgres@postgres:5432/postgres
+SECRET: sdfnwef80wejw8fjw489fjw48fjw4893f89w4g
+REDIS_URL: redis://redis:6379
+```
+
+### Render Docker image deployment
+
+The app is deployed in Render also as a [Docker image based web service](https://docs.render.com/deploy-an-image). The CI workflow also deploys the newly created image on Render. For the moment, the <i>Wait for deployment</i> -action doesn't seem to support tracking these prebuilt image web services. Successful deployment therefore is not guaranteed. This is not critical for now, as this secondary deployment is just a demonstration that it can be deployed both ways.
+
+I would otherwise prefer this containerized deployment as there is less configuration on the hosting service. Most of the configuration is done in the dockerfile, and the image content and size can be more optimized.
+
+These separate deployments also have no real-time communication with each other, despite sharing the same databases and this way recovering all messages on a page refresh. I'm interested in looking further into how these real-time chat applications could be scaled horizontally with multiple containers and servers.
+
+The deployed containerized version found here: https://messenger-containerized.onrender.com
+
+More on GitHub Actions and setup below.
+
 ## CI/CD
 
 There is a [Github Actions workflow](https://docs.github.com/en/actions/using-workflows/about-workflows) in place to lint, build, test, tag & deploy the application. Everything is tested in pull requests so broken code doesn't get into main branch.
 
-The the CI/CD pipeline consist of 3 jobs:
+The the CI/CD pipeline consist of these jobs:
 
 ### build
 
@@ -40,6 +74,15 @@ If build is successful, runs [github-tag-action](https://github.com/anothrNick/g
 
 If build and tagging are successful, deploys the main branch to [Render](https://render.com/) using [render-deploy-action](https://github.com/johnbeynon/render-deploy-action).
 After initializing the deployment, waits for deployment to finish successfully using [render-action](https://github.com/Bounceapp/render-action). It's good to note that these are separate steps to make locating possible problems easier. Free tier render services might take a long time to build and start up if there's a lot of traffic.
+
+### publish_docker_image
+
+If build and tagging are successful, creates a docker image from the application. Also deploys the image to GitHub Container Repository. It gets the version from the tag_release job output, and sets it as a tag for the image. It also sets the `latest` tag on the image.
+
+### container_deployment
+
+Deploys the latest published image to Render using the same deploy action used in the repository-based deployment. The wait action is not used as it doesn't currently support image-based deployments.
+
 
 ## Tests
 
@@ -115,11 +158,12 @@ Frontend is built with [React](https://react.dev/) and styled with [Material UI]
 
 ## Planned
 
+- Render wait action for image deployment to CI pipeline
+   - This requires an update for the action currently in use, or a new action
 - Component tests to frontend
 - Group chats to frontend
    - Functionality already exists on the server
 - Full CRUD-actions to users in API
-- Containerizing the whole application using [Docker](https://www.docker.com/)
 
 ## Setup
 
