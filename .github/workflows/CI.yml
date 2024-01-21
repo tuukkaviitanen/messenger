@@ -140,7 +140,7 @@ jobs:
 
   publish_docker_image:
     if: ${{ github.event_name == 'push' }}
-    needs: [build, tag_release, deployment]
+    needs: [build, tag_release]
     runs-on: ubuntu-20.04
     permissions:
       contents: read
@@ -197,7 +197,7 @@ jobs:
           service-id: ${{ secrets.RENDER_CONTAINER_SERVICE_ID }}
           api-key: ${{ secrets.RENDER_API_KEY }}
       - name: Wait for Render Deployment
-        uses: bounceapp/render-action@0.7.1
+        uses: bounceapp/render-action@0.8.0
         with:
           render-token: ${{ secrets.RENDER_API_KEY }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
