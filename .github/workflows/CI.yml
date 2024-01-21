@@ -182,6 +182,6 @@ jobs:
         with:
           context: .
           tags: |
-            '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag_release.outputs.version }}'
-            '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest'
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag_release.outputs.version }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           push: true
