@@ -1,4 +1,4 @@
-# Build stage
+# Build stage (gets deleted later)
 
 FROM node:20-bookworm-slim as build-stage
 
