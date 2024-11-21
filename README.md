@@ -2,10 +2,7 @@
 
 > Full Stack chat application using Node backend and React frontend. Currently includes a global chatroom and private chats.
 
-LIVE ON RENDER: https://messenger-app-3ztg.onrender.com.
-Running as a free tier service so it might take some time to start up.
-
-Working hours for the Full Stack Project -course are in the `working_hours.md` file in the root of the repository.
+Check out live at https://messenger.tuukka.net
 
 ## Summary
 
