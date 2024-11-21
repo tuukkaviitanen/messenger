@@ -5,18 +5,15 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
-
+    branches: ["main"]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     services:
-
       postgres:
         # Docker Hub image
         image: postgres
@@ -61,46 +58,46 @@ jobs:
         working-directory: ./server
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
 
-    - name: Install backend dependencies
-      run: npm ci
+      - name: Install backend dependencies
+        run: npm ci
 
-    - name: Run backend linter
-      run: npm run lint
+      - name: Run backend linter
+        run: npm run lint
 
-    - name: Build backend
-      run: npm run build
+      - name: Build backend
+        run: npm run build
 
-    - name: Run backend tests
-      run: npm test
+      - name: Run backend tests
+        run: npm test
 
-    - name: Install frontend dependencies
-      run: npm ci
-      working-directory: ./client
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: ./client
 
-    - name: Run frontend linter
-      run: npm run lint
-      working-directory: ./client
+      - name: Run frontend linter
+        run: npm run lint
+        working-directory: ./client
 
-    - name: Build frontend
-      run: npm run build
-      working-directory: ./client
+      - name: Build frontend
+        run: npm run build
+        working-directory: ./client
 
-    - name: Run end-to-end tests
-      uses: cypress-io/github-action@v6
-      env:
-        CYPRESS_BASE_URL: http://localhost:3000
-      with:
-        command: npm run test:e2e
-        start: npm run start:test
-        wait-on: http://localhost:3000
-        working-directory: ./server
+      - name: Run end-to-end tests
+        uses: cypress-io/github-action@v6
+        env:
+          CYPRESS_BASE_URL: http://localhost:3000
+        with:
+          command: npm run test:e2e
+          start: npm run start:test
+          wait-on: http://localhost:3000
+          working-directory: ./server
 
   tag_release:
     needs: ["build"]
@@ -119,7 +116,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
-
 
   deployment:
     needs: [build, tag_release]
@@ -159,6 +155,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Set up QEMU for cross-platform builds
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       # Set up BuildKit Docker container builder to be able to build
       # multi-platform images and export cache
       # https://github.com/docker/setup-buildx-action
@@ -185,6 +185,7 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.tag_release.outputs.version }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           push: true
+          platforms: linux/amd64,linux/arm64
 
   container_deployment:
     needs: [publish_docker_image]
@@ -196,4 +197,3 @@ jobs:
         with:
           service-id: ${{ secrets.RENDER_CONTAINER_SERVICE_ID }}
           api-key: ${{ secrets.RENDER_API_KEY }}
-
