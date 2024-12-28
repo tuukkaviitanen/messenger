@@ -48,17 +48,17 @@ SECRET: sdfnwef80wejw8fjw489fjw48fjw4893f89w4g
 REDIS_URL: redis://redis:6379
 ```
 
-### Render Docker image deployment
+### ~~Render Docker image deployment~~
 
-The app is deployed in Render also as a [Docker image based web service](https://docs.render.com/deploy-an-image). The CI workflow also deploys the newly created image on Render. For the moment, the <i>Wait for deployment</i> -action doesn't seem to support tracking these prebuilt image web services. Successful deployment therefore is not guaranteed. This is not critical for now, as this secondary deployment is just a demonstration that it can be deployed both ways.
+~~The app is deployed in Render also as a [Docker image based web service](https://docs.render.com/deploy-an-image). The CI workflow also deploys the newly created image on Render. For the moment, the <i>Wait for deployment</i> -action doesn't seem to support tracking these prebuilt image web services. Successful deployment therefore is not guaranteed. This is not critical for now, as this secondary deployment is just a demonstration that it can be deployed both ways.~~
 
-I would otherwise prefer this containerized deployment as there is less configuration on the hosting service. Most of the configuration is done in the dockerfile, and the image content and size can be more optimized.
+~~I would otherwise prefer this containerized deployment as there is less configuration on the hosting service. Most of the configuration is done in the dockerfile, and the image content and size can be more optimized.~~
 
-These separate deployments also have no real-time communication with each other, despite sharing the same databases and this way recovering all messages on a page refresh. I'm interested in looking further into how these real-time chat applications could be scaled horizontally with multiple containers and servers.
+~~These separate deployments also have no real-time communication with each other, despite sharing the same databases and this way recovering all messages on a page refresh. I'm interested in looking further into how these real-time chat applications could be scaled horizontally with multiple containers and servers.~~
 
-The deployed containerized version found here: https://messenger-containerized.onrender.com
+~~The deployed containerized version found here: https://messenger-containerized.onrender.com~~
 
-More on GitHub Actions and setup below.
+~~More on GitHub Actions and setup below.~~
 
 ## CI/CD
 
@@ -78,10 +78,10 @@ Build job is actually done 3 times concurrently. Each with a different node vers
 
 If build is successful, runs [github-tag-action](https://github.com/anothrNick/github-tag-action) that bumps the tag version of the repository. By default it bumps up the patch version, but minor version and major version can also be bumped by adding #major or #minor to a commit message.
 
-### deployment
+### ~~deployment~~
 
-If build and tagging are successful, deploys the main branch to [Render](https://render.com/) using [render-deploy-action](https://github.com/johnbeynon/render-deploy-action).
-After initializing the deployment, waits for deployment to finish successfully using [render-action](https://github.com/Bounceapp/render-action). It's good to note that these are separate steps to make locating possible problems easier. Free tier render services might take a long time to build and start up if there's a lot of traffic.
+~~If build and tagging are successful, deploys the main branch to [Render](https://render.com/) using [render-deploy-action](https://github.com/johnbeynon/render-deploy-action).~~
+~~After initializing the deployment, waits for deployment to finish successfully using [render-action](https://github.com/Bounceapp/render-action). It's good to note that these are separate steps to make locating possible problems easier. Free tier render services might take a long time to build and start up if there's a lot of traffic.~~
 
 ### publish_docker_image
 
@@ -163,15 +163,6 @@ Frontend is built with [React](https://react.dev/) and styled with [Material UI]
 [Full-Duplex](https://techterms.com/definition/full-duplex) connection to server is created using [Socket.io](https://socket.io/). It primarily uses WebSockets to send messages both ways. All socket connections are authenticated with the JsonWebToken that is returned from the server on successful login. JWT is currently stored in [LocalStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
 
 [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) is not needed even when running the client in development mode as Vite is configured to proxy these connections to server port and to change the origin. This works for both HTTP and WebSocket connections.
-
-## Planned
-
-- Render wait action for image deployment to CI pipeline
-   - This requires an update for the action currently in use, or a new action
-- Component tests to frontend
-- Group chats to frontend
-   - Functionality already exists on the server
-- Full CRUD-actions to users in API
 
 ## Setup
 

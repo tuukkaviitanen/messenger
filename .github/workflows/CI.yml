@@ -117,23 +117,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BUMP: patch
 
-  deployment:
-    needs: [build, tag_release]
-    runs-on: ubuntu-20.04
-    if: ${{ github.event_name == 'push' }}
-    steps:
-      - name: Deploy to Render
-        uses: johnbeynon/render-deploy-action@v0.0.8
-        with:
-          service-id: ${{ secrets.RENDER_SERVICE_ID }}
-          api-key: ${{ secrets.RENDER_API_KEY }}
-      - name: Wait for Render Deployment
-        uses: bounceapp/render-action@0.7.1
-        with:
-          render-token: ${{ secrets.RENDER_API_KEY }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          service-id: ${{ secrets.RENDER_SERVICE_ID }}
-
   publish_docker_image:
     if: ${{ github.event_name == 'push' }}
     needs: [build, tag_release]
